@@ -1,0 +1,33 @@
+en:
+  welcome: "Welcome to Calculator. Enter your name"
+  valid_name: "Make sure to enter a valid name"
+  input_one: "What's the first number?"
+  input_two: "What's the second number?"
+  valid_number: "Hmm... that doesn't look like a valid number"
+  choice: "Must choose 1, 2, 3, or 4"
+  another: "Do you want to perform another calculation? (Y to calculate again)"
+  thanks: "Thank you for using the calculator. Good bye!"
+  operator_prompt: "What operation would you like to perform?
+    1) add
+    2) subtract
+    3) multiply
+    4) divide"
+  two_nums: "the two numbers"
+  result: "The result is"
+
+nl:
+  welcome: "Welkom. Zet jouw naam."
+  valid_name: "zet een geldige naam"
+  input_one: "Wat is het eerste nummer?"
+  input_two: "Wat is het tweede nummer?"
+  valid_number: "Hmm.. dat is geen geldige nummer"
+  choice: "Je heb 1, 2, 3, or 4 nodig"
+  another: "Wil je nog een berekening?"
+  thanks: "Bedankt voor de calculator aan het gebruik. Dag!"
+  operator_prompt: "Welke berekening je nodig?
+    1) optellen
+    2) aftrekken
+    3) vermenigvuldigen
+    4) verdelen"
+  two_nums: "het twee nummers"
+  result: "Het resultaat is"
