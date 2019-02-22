@@ -1,40 +1,40 @@
-#inputs:
- #   the loan amount
-  #  the Annual Percentage Rate (APR)
-   # the loan duration 
+# inputs:
+# the loan amount
+# the Annual Percentage Rate (APR)
+# the loan duration
 
-#Output
-    #monthly interest rate
-    #loan duration in months
+# Output
+# monthly interest rate
+# loan duration in months
 
-#Process
-#calculate 
-    # m = monthly payment
-    # j = monthly interest rate
-    # n = loan duration (calculate it from whatever format provided into months)
+# Process
+# calculate
+# m = monthly payment
+# j = monthly interest rate
+# n = loan duration (calculate it from whatever format provided into months)
 
-  #PEDAC
-  #problem - build a payment calculator - 
-  #take input from user
-  # run basic arithmetic ops and conversions before algo
-  # output result
+# PEDAC
+# problem-build a payment calculator
+# take input from user
+# run basic arithmetic ops and conversions before algo
+# output result
 
-  #Examples/test cases
+# Examples/test cases
 
-#INTRATE = 0.02
-#def car_loan(loan)
- # puts loan * INTRATE
-#end
+# INTRATE = 0.02
+# def car_loan(loan)
+# puts loan * INTRATE
+# end
 
 # car_loan(2222)
 
-#Data - we need from inputs
+# Data - we need from inputs
 # loan amount
 # APR
 # loan duration
 
 # process
-# validate inputs 
+# validate inputs
 # loan amount
 # apr --> monthly rate
 # loan duration --> months
@@ -42,10 +42,10 @@
 # Algorithm:
 # m = p * (j / (1 - (1 + j)**(-n)))
 
-   # m = monthly payment
-    # p = loan amount
-    # j = monthly interest rate
-    # n = loan duration    in months
+# m = monthly payment
+# p = loan amount
+# j = monthly interest rate
+# n = loan duration in months
 
 def valid_input?(input)
   input == input.to_i()
@@ -100,11 +100,11 @@ loop do
   int_rate = (int_rate / 12) / 100
 
   puts "Your monthly interest rate is #{int_rate.round(2)}%"
-  monthly_payment = carloan * (int_rate / (1 - (1 + int_rate)**(-loan_months)))
+  monthly_payment = carloan * (int_rate / (1 - (1 + int_rate)**-loan_months))
   puts "Your monthly payment is #{monthly_payment.round(2)}"
 
-  puts "Would you like to perform another calculation? Press y if yes.
-  Press any key to exit."
+  puts "Would you like to do another calculation?"
+  puts "Press y if yes. Press any key to exit."
   answer = gets.chomp.to_s()
   break unless answer.downcase().start_with?('y')
 end
