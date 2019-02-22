@@ -47,8 +47,12 @@
     # j = monthly interest rate
     # n = loan duration    in months
 
-def valid_input?(num)
-  num > 0 && num.to_f()
+def valid_input?(input)
+  input == input.to_i()
+end
+
+def valid_number?(num)
+  num.to_i().to_f() != 0
 end
 
 loop do
@@ -59,8 +63,9 @@ loop do
   loop do
     puts "What is the amount of your car loan?"
     carloan = gets.chomp.to_i().to_f()
-    #if carloan > 0
-    if valid_input?(carloan)
+    # puts "Your car loan is #{carloan} dollars."
+    # if carloan > 0
+    if valid_input?(carloan) && valid_number?(carloan)
       break
     else
       puts "Incorrect number. Please enter the correct number"
@@ -72,7 +77,7 @@ loop do
   loop do
     puts "What is the period of your loan? Please enter in years."
     loan_period = gets.chomp.to_i
-    if valid_input?(loan_period)
+    if valid_input?(loan_period) && valid_number?(loan_period)
       break
     else
       puts "Please enter the correct period"
@@ -82,13 +87,11 @@ loop do
   loan_months = loan_period * 12
   puts "Your car loan duration is #{loan_months} months."
 
-
-
   int_rate = ''
   loop do
     puts "What is the Annual Percentage Rate?"
     int_rate = gets.chomp.to_i().to_f()
-    if valid_input?(int_rate)
+    if valid_input?(int_rate) && valid_number?(int_rate)
       break
     else
       puts "Please enter the correct rate"
@@ -96,11 +99,12 @@ loop do
   end
   int_rate = (int_rate / 12) / 100
 
-  puts "Your monthly interest rate is #{int_rate}%"
+  puts "Your monthly interest rate is #{int_rate.round(2)}%"
   monthly_payment = carloan * (int_rate / (1 - (1 + int_rate)**(-loan_months)))
-  puts "Your monthly payment is #{monthly_payment.floor}"
-  
-  puts "Would you like to perform another calculation? Press y if yes, or any other key to exit."
+  puts "Your monthly payment is #{monthly_payment.round(2)}"
+
+  puts "Would you like to perform another calculation? Press y if yes.
+  Press any key to exit."
   answer = gets.chomp.to_s()
   break unless answer.downcase().start_with?('y')
 end
