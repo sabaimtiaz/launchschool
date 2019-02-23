@@ -97,7 +97,7 @@ loop do
       puts "Please enter the correct rate"
     end
   end
-  int_rate_output = int_rate/12
+  int_rate_output = int_rate / 12
   int_rate = (int_rate / 12) / 100
 
   puts "Your monthly interest rate is #{int_rate_output.round(2)}%"
