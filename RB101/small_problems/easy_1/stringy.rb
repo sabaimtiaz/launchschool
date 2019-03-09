@@ -1,46 +1,40 @@
 # problem
 # takes a positive integer
+
 # input
 # argument = positibve integer
 # output 
 # returns string of alt 1s and 0s
+# conditional statement here that if the integer is positive the string begins with 1.
 # length string = integer
 # examples / test cases
 # algo: 
 
-#def stringy2(num)
-#def stringy(num)
 
-num = 6
-# loops
-#num.times do 
-num_one = 0
-  loop do 
-   num_one += 1
-   # array = i
-    # array
-    #puts array
-    break if num_one == 1 
+
+def stringy(size)
+  numbers = []
+
+  size.times do |index|
+    number = index.even? ? 1 : 0
+    p number
+ #   numbers << number
   end
+  puts numbers.join
+end
+stringy(10)
+stringy(6)
+stringy(0)
+stringy(7)
 
 
-a = -1
-   loop do
-     a += 1
-    # puts array_two
-     break if a == 0 
-       end
-       puts a
-
-
-
- 
-  #new_arr = arr * arr.size
-  #p new_arr
+#def count(num)
+ # num.times do |index|
+  #  if index.even?
+   #   puts 1
+   # else 
+    #  puts 0
+  #end
 #end
-
-#times(%w[1, 0, 1, 0])
-
-
-
-
+# end
+#count(6)

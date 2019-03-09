@@ -22,6 +22,9 @@ def stringy(size)
 
   size.times do |index|
     number = index.even? ? 1 : 0
+    if size.odd?
+    number = index.even? ? 0: 1
+  end
     p number
  #   numbers << number
   end
@@ -29,3 +32,5 @@ def stringy(size)
  puts numbers.join
 end
 stringy(10)
+stringy(6)
+stringy(0)
