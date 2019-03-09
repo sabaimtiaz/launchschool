@@ -12,11 +12,7 @@ loop do
   CHOICES.each { |key, value| puts "Enter #{value} or #{key} for #{value}" }
   # puts 'Choose rock, paper, scissors, lizard, or Spock.'
   input = gets.chomp
-  prompt("You chose #{input}.")
-  # computer generates a choice
-  computer_choice = CHOICES.values.sample
-  prompt("The computer chose #{computer_choice}.")
-
+ 
   def convert(input)
     if input.size <= 1
       if CHOICES.to_a.flatten.include?(input)
@@ -28,6 +24,11 @@ loop do
   end
 
   returned_val = convert(input)
+
+   prompt("You chose #{returned_val}.")
+   # computer generates a choice
+   computer_choice = CHOICES.values.sample
+   prompt("The computer chose #{computer_choice}.")
 
   def win?(returned_val, computer_choice)
     (returned_val == "paper" && computer_choice == "rock") ||
@@ -63,23 +64,25 @@ loop do
 
   if win?(returned_val, computer_choice)
     player_score += 1
-    prompt("You scored #{player_score}")
+    prompt("You scored 1.")
     if player_score == 5
       prompt('You have 5 wins!')
       break
     end
   elsif win?(computer_choice, returned_val)
     computer_score += 1
-    prompt("The computer scored #{computer_score}")
+    prompt("The computer scored 1.")
     if computer_score == 5
       prompt('The computer has 5 wins!')
       break
     end
   end
+    prompt("Your total score is #{player_score} and the computer score is #{computer_score}")
 
   prompt('Do you want to play again? Enter y or any other key to exit:')
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
+  system('clear') || system('cls')
 end # commenting out loop while we do conversion
 prompt('Thank you for playing. Live long and prosper!')
 
