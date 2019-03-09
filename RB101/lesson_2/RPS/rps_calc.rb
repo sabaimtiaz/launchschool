@@ -8,7 +8,7 @@ loop do
 
   # puts 'Choose rock, paper, scissors, lizard, or Spock.'
   input = gets.chomp
-  puts "You chose #{input}."
+  prompt('You chose #{input}.')
 
   # computer generates a choice
 
@@ -43,9 +43,9 @@ loop do
 
   def display_results(returned_val, computer_choice)
     if win?(returned_val, computer_choice)
-      puts "you win"
+      prompt('you win')
     else
-      puts "you lose"
+      prompt('you lose')
     end
   end
  
@@ -53,7 +53,7 @@ loop do
     score +=1
     p score
     if score == 5
-      puts "You reached the maximum score"
+      prompt('You reached the maximum score.')
       break
     end
   end
@@ -62,21 +62,21 @@ loop do
   # combining validity and equality
 
   if CHOICES.key?(input) || CHOICES.value?(input) || input == "sp"
-    puts 'Processing..'
-  elsif puts "This is invalid input. Try again."
+    prompt('Processing..')
+  elsif prompt('This is invalid input. Try again.')
   end
 
   if input == computer_choice || input == computer_choice[0] || input == "sp" && computer_choice == "Spock"
-    puts 'Its a tie. Try again.'
+    prompt('Its a tie. Try again.')
   end
 
   display_results(returned_val, computer_choice)
 
-  puts 'Do you want to play again?'
+  prompt('Do you want to play again?')
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end # commenting out loop while we do conversion
-puts 'Thank you for playing. Goodbye!'
+prompt('Thank you for playing. Goodbye!')
 
 # paper && rock
 # def choices(returned_val, computer_choice)

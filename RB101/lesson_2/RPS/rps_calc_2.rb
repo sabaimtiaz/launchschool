@@ -3,18 +3,19 @@ input = ''
 player_score = 0
 computer_score = 0
 
+def prompt(message) # need a generic prompt method to format output
+  Kernel.puts("=>#{message}")
+end
+
 loop do
   puts "Welcome to Rock Paper Scissors Spock Lizard!"
   CHOICES.each { |key, value| puts "Enter #{value} or #{key} for #{value}" }
-
   # puts 'Choose rock, paper, scissors, lizard, or Spock.'
   input = gets.chomp
-  puts "You chose #{input}."
-
+  prompt("You chose #{input}.")
   # computer generates a choice
-
   computer_choice = CHOICES.values.sample
-  puts "The computer chose #{computer_choice}."
+  prompt("The computer chose #{computer_choice}.")
 
   def convert(input)
     if input.size <= 1
@@ -41,51 +42,46 @@ loop do
     (returned_val == "Spock" && computer_choice == "rock")
   end
 
-
   def display_results(returned_val, computer_choice)
     if win?(returned_val, computer_choice)
-      puts "you win"
+      prompt('You win!')
     elsif win?(computer_choice, returned_val)
-      puts "you lose"
+      prompt('You lose!')
     end
   end
- 
- 
   # combining validity and equality
-
   if CHOICES.key?(input) || CHOICES.value?(input) || input == "sp"
-    puts 'Processing..'
-  elsif puts "This is invalid input. Try again."
+    prompt('Processing..')
+  elsif prompt('This is an incorrect choice. Try again.')
   end
 
   if input == computer_choice || input == computer_choice[0] || input == "sp" && computer_choice == "Spock"
-    puts 'Its a tie. Try again.'
+    prompt('Its a tie. Try again.')
   end
 
   display_results(returned_val, computer_choice)
 
-
   if win?(returned_val, computer_choice)
-    player_score +=1
-    puts "You scored #{player_score}"
+    player_score += 1
+    prompt("You scored #{player_score}")
     if player_score == 5
-      puts "You have 5 wins!"
+      prompt('You have 5 wins!')
       break
     end
-    elsif win?(computer_choice, returned_val)
-      computer_score +=1
-      puts "The computer scored #{computer_score}"
-      if computer_score == 5
-        puts "The computer has 5 wins!"
-        break
-      end
+  elsif win?(computer_choice, returned_val)
+    computer_score += 1
+    prompt("The computer scored #{computer_score}")
+    if computer_score == 5
+      prompt('The computer has 5 wins!')
+      break
+    end
   end
 
-  puts 'Do you want to play again?'
+  prompt('Do you want to play again? Enter y or any other key to exit:')
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end # commenting out loop while we do conversion
-puts 'Thank you for playing. Goodbye!'
+prompt('Thank you for playing. Live long and prosper!')
 
 # paper && rock
 # def choices(returned_val, computer_choice)
