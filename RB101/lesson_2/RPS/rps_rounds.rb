@@ -36,7 +36,7 @@ loop do
 
   def win?(returned_val, computer_choice)
     (returned_val == "paper" && computer_choice == "rock") ||
-    (returned_val == "paper" && computer_choice =="Spock") ||
+    (returned_val == "paper" && computer_choice == "Spock") ||
     (returned_val == "rock" && computer_choice == "lizard") ||
     (returned_val == "rock" && computer_choice == "scissors") ||
     (returned_val == "scissors" && computer_choice == "paper") ||
