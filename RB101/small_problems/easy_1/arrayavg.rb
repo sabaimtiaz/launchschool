@@ -28,7 +28,7 @@ average([9, 47, 23, 95, 16, 52])
 def average(numbers)
   sum = numbers.reduce { |sum, number| sum + number }
   avg = sum / numbers.count
-  puts avg
+  puts avg.to_f
 end
 
 average([5, 2])
