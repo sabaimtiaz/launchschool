@@ -12,4 +12,3 @@ area = (length * width).round(2)
 sqfeet = 10.7639
 area_sqfeet = (area * sqfeet).round(2)
 puts "The area of the room is #{area} square meters (#{area_sqfeet} square feet)."
-
