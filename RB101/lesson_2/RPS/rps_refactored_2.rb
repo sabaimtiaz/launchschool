@@ -44,20 +44,15 @@ end
 
 loop do
   input = ''
+  puts "Welcome to Rock Paper Scissors Spock Lizard!"
 
   loop do
-    puts "Welcome to Rock Paper Scissors Spock Lizard!"
     CHOICES.each { |key, value| puts "Enter #{value} or #{key} for #{value}" }
     input = gets.chomp
     if valid_choice?(input)
       break
     else
       prompt('This is invalid.')
-      prompt('Do you want to play again?')
-      prompt('Enter y to continue. Press any other key to exit:')
-      answer = gets.chomp
-      break unless answer.downcase.start_with?('y')
-      system('clear')
     end
   end
 
@@ -86,6 +81,7 @@ loop do
     prompt("5 wins! Game over!")
     break
   end
+
   prompt('Do you want to play again?')
   prompt('Enter y to continue. Press any other key to exit:')
   answer = gets.chomp
