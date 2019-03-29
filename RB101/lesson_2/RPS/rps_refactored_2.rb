@@ -42,9 +42,13 @@ def valid_choice?(choice)
   CHOICES.to_a.flatten.include?(choice)
 end
 
+puts "Welcome to Rock Paper Scissors Spock Lizard!"
+puts "Win five games against the computer to become the champion!"
+puts "OR... you can just play one round."
+puts "---------------------------------"
+
 loop do
   input = ''
-  puts "Welcome to Rock Paper Scissors Spock Lizard!"
 
   loop do
     CHOICES.each { |key, value| puts "Enter #{value} or #{key} for #{value}" }
@@ -64,7 +68,7 @@ loop do
   winner = determine_winner?(returned_val, computer_choice)
 
   display_results(returned_val, computer_choice)
-
+  puts "-------------------------------------"
   if winner == true
     player_score += 1
     prompt("You scored 1.")
@@ -73,15 +77,18 @@ loop do
     prompt("The computer scored 1.")
   end
 
-  system('clear')
   prompt("Your total score is #{player_score}.")
   prompt("The computer's score is #{computer_score}.")
 
   if player_score == 5 || computer_score == 5
+    puts "-------------------------------------"
     prompt("5 wins! Game over!")
     break
   end
 
+  Kernel.sleep(1)
+
+  puts "-----------------------------------------"
   prompt('Do you want to play again?')
   prompt('Enter y to continue. Press any other key to exit:')
   answer = gets.chomp
