@@ -21,7 +21,7 @@ munsters = {
 munsters.each do |name, info|
   case info["age"]
   when 0...18
-   info["age_group"] = "child"
+   info["age_group"] = "kid"
  when 18...65
   info["age_group"] = "adult"
 else
