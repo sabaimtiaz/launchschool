@@ -40,4 +40,3 @@ p swap('Abcde') == 'ebcdA'
 p swap('a') == 'a'
 
 
-
