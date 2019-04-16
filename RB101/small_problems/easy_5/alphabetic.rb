@@ -24,15 +24,15 @@ def alphabetic_number_sort(numbers)
                        12 => "twelve", 13 => "thirteen", 14 => "fourteen",
                        15 => "fifteen", 16 => "sixteen", 17 => "seventeen",
                        18 => "eighteen", 19 => "nineteen" }
-  new_arr = []
+  words_arr = []
   result = []
   numbers.each do |num|
     if numbers_as_words.key?(num)
-     new_arr << numbers_as_words[num]
+     words_arr << numbers_as_words[num]
     end
   end
 
-  new_arr.sort.each do |word|
+  words_arr.sort.each do |word|
     if numbers_as_words.value?(word)
       result << numbers_as_words.key(word)
     end
