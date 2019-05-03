@@ -1,5 +1,3 @@
-
-
 def merge(arr1, arr2)
   arr1 << arr2
   arr1.flatten!.uniq!
