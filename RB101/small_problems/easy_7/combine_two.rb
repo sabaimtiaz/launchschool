@@ -1,3 +1,4 @@
+#test
 a = [1, 2, 3]
 b = ['a', 'b', 'c']
 arr = []
@@ -27,3 +28,15 @@ def interleave(array1, array2)
   result
 end
 p interleave([1, 2, 3], ['a', 'b', 'c'])
+
+# Solution with #zip
+#testing
+array1 = [1, 2, 3]
+array2 = ['a', 'b', 'c']
+p array1.zip(array2).flatten
+
+def interleave(array1, array2)
+  array1.zip(array2).flatten
+end
+p interleave([1, 2, 3], ['a', 'b', 'c'])
+
