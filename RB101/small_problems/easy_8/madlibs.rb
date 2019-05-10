@@ -1,0 +1,14 @@
+p "Enter a noun"
+noun = gets.chomp.to_s
+p "Enter a verb"
+verb = gets.chomp.to_s
+p "Enter an adjective"
+adjective = gets.chomp.to_s
+p "Enter an adverb"
+adverb = gets.chomp.to_s
+
+sentence_1 = "Do you #{verb} your #{adjective} #{noun} quite #{adverb}? That's hilarious!"
+sentence_2 = "The #{adjective} #{noun} #{verb} #{adverb} over the lazy dog"
+sentence_3 = "The #{noun} #{adverb} #{verb}s up #{adjective} Joe's turtle"
+
+puts [sentence_1, sentence_2, sentence_3].sample
