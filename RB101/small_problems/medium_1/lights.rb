@@ -16,7 +16,6 @@
 # iterator 1 = index + 1
 # iterator 2 = n repetitions
 
-require 'pry'
 def initialise_array(n)
   lights = []
   n.times do
@@ -25,7 +24,6 @@ def initialise_array(n)
   lights
 end
 
-
 def toggle(element)
   element == 0 ? 1 : 0
 end
@@ -33,13 +31,20 @@ end
 def lights(n)
   arr = initialise_array(n)
   n.times do |val|
-    arr.map.with_index do |e, i|
-      if (i + 1) % (val + 1) == 0
-        arr[i] = toggle(e)
+    arr.map.with_index do |element, ind|
+      if (ind + 1) % (val + 1) == 0
+        arr[ind] = toggle(element)
       end
     end
   end
-  arr
+  result_arr = []
+  arr.each.with_index do |element, ind|
+    if element == 1
+      result_arr << (ind + 1)
+    end
+  end
+  result_arr
 end
-p lights(5)
 
+p lights(10)
+p lights(5)
