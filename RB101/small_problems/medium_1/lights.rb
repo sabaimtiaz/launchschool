@@ -16,13 +16,30 @@
 # iterator 1 = index + 1
 # iterator 2 = n repetitions
 
-
-lights = [0, 1, 0, 1, 0]
-
-def toggle(switches)
-  switches.map do |switch| 
-    switch == 0 ? 1 : 0 
+require 'pry'
+def initialise_array(n)
+  lights = []
+  n.times do
+    lights << 0
   end
+  lights
 end
 
-p toggle(lights) 
+
+def toggle(element)
+  element == 0 ? 1 : 0
+end
+
+def lights(n)
+  arr = initialise_array(n)
+  n.times do |val|
+    arr.map.with_index do |e, i|
+      if (i + 1) % (val + 1) == 0
+        arr[i] = toggle(e)
+      end
+    end
+  end
+  arr
+end
+p lights(5)
+
