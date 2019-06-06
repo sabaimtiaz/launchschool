@@ -12,7 +12,8 @@ RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 5, 9], [3, 5, 7]] + 
                 [[2, 3, 1], [5, 6, 4], [8, 9, 7]] + 
                 [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
-                [[5, 9, 1], [5, 7, 3]]
+                [[5, 9, 1], [5, 7, 3]] +
+                [[7, 5, 3], [3, 5, 7]]
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -78,6 +79,8 @@ def detect_risk_location(brd)
     third_val = brd[line[2]]
     if first_val == "X" && second_val == "X" && third_val == " "
       return line[2]
+    elsif first_val == " " && second_val == "X" && third_val == "X"
+      return line[0]
     else
       return nil
     end
@@ -85,7 +88,6 @@ def detect_risk_location(brd)
 end
 
 def computer_places_piece!(brd)
-  binding.pry
   if detect_risk_location(brd) != nil
     square = detect_risk_location(brd)
     brd[square] = COMPUTER_MARKER
@@ -116,7 +118,6 @@ def detect_winner(brd)
   end
   nil
 end
-
 
 player_score = 0
 computer_score = 0
