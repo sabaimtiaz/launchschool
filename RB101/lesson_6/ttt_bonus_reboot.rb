@@ -7,12 +7,12 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]] # diagonals
 
-RISK_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + 
+RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + 
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + 
                 [[1, 5, 9], [3, 5, 7]] + 
                 [[2, 3, 1], [5, 6, 4], [8, 9, 7]] + 
                 [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
-                [[9, 5, 1], [3, 5, 7]]
+                [[5, 9, 1], [5, 7, 3]]
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -23,7 +23,7 @@ def display_board(brd)
   puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
   puts ""
   puts "       |       |"
-  puts "    #{brd[1]}  |  #{brd[2]}    | #{brd[3]}"
+  puts "   #{brd[1]}   |  #{brd[2]}    | #{brd[3]}"
   puts "       |       |"
   puts "-------+-------+------"
   puts "       |       |"
@@ -71,13 +71,27 @@ def player_places_piece!(brd) # method that is going to modify this board
   brd[square] = PLAYER_MARKER
 end
 
-def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER 
+def detect_risk_location(brd)
   RISK_LINES.each do |line|
-    if brd.values_at(*line) == ["X", "X", "nil"] 
-      brd.values_at(*line)["nil"] == COMPUTER_MARKER 
-      end
+    first_val = brd[line[0]]
+    second_val = brd[line[1]]
+    third_val = brd[line[2]]
+    if first_val == "X" && second_val == "X" && third_val == " "
+      return line[2]
+    else
+      return nil
+    end
+  end
+end
+
+def computer_places_piece!(brd)
+  binding.pry
+  if detect_risk_location(brd) != nil
+    square = detect_risk_location(brd)
+    brd[square] = COMPUTER_MARKER
+  else
+    square = empty_squares(brd).sample
+    brd[square] = COMPUTER_MARKER
   end
 end
 
