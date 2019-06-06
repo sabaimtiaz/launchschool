@@ -1,9 +1,19 @@
+require 'pry'
+
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = '0'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]] # diagonals
+
+RISK_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + 
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + 
+                [[1, 5, 9], [3, 5, 7]] + 
+                [[2, 3, 1], [5, 6, 4], [8, 9, 7]] + 
+                [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
+                [[9, 5, 1], [3, 5, 7]]
+
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -63,7 +73,12 @@ end
 
 def computer_places_piece!(brd)
   square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER
+  brd[square] = COMPUTER_MARKER 
+  RISK_LINES.each do |line|
+    if brd.values_at(*line) == ["X", "X", "nil"] 
+      brd.values_at(*line)["nil"] == COMPUTER_MARKER 
+      end
+  end
 end
 
 def board_full?(brd)
@@ -88,6 +103,10 @@ def detect_winner(brd)
   nil
 end
 
+
+player_score = 0
+computer_score = 0
+
 loop do
   board = initialize_board
 
@@ -107,6 +126,20 @@ loop do
   else
     prompt "It's a tie!"
   end
+
+  # scoring
+  if detect_winner(board) == 'Player'
+   player_score = player_score + 1
+   player_score
+  elsif detect_winner(board) == 'Computer'
+    computer_score = computer_score + 1
+    computer_score
+  break if player_score == 5 || computer_score == 5
+ end
+
+  puts "The player's score is #{player_score}"
+  puts "The computer's score is #{computer_score}"
+
 
   prompt "Play again? (y or n)"
   answer = gets.chomp
