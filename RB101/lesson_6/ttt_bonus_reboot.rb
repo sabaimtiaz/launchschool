@@ -12,9 +12,10 @@ RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 5, 9], [3, 5, 7]] + 
                 [[2, 3, 1], [5, 6, 4], [8, 9, 7]] + 
                 [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
-                [[5, 9, 1], [5, 7, 3]] +
+            #    [[5, 9, 1], [5, 7, 3]] +
                 [[3, 5, 7], [7, 5, 3]] +
-                [[1, 9, 5], [1, 5, 9]]
+                [[1, 5, 9], [9, 5, 1]]
+
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -78,7 +79,6 @@ def detect_risk_location(brd)
     first_val = brd[line[0]]
     second_val = brd[line[1]]
     third_val = brd[line[2]]
- #   binding.pry
     if first_val == "X" && second_val == "X" && third_val == " "
       return line[2]
     elsif first_val == " " && second_val == "X" && third_val == "X"
@@ -89,27 +89,26 @@ def detect_risk_location(brd)
   end
 end
 
-def detect_winning_move(brd)
-  RISK_LINES.each do |line|
-    first_val = brd[line[0]]
-    second_val = brd[line[1]]
-    third_val = brd[line[2]]
-    if first_val == "O" && second_val == "O" && third_val == " "
-      return line[0]
-    else
-      return nil
-    end
-  end
-end
+# def detect_winning_move(brd)
+#   RISK_LINES.each do |line|
+#     first_val = brd[line[0]]
+#     second_val = brd[line[1]]
+#     third_val = brd[line[2]]
+#     if first_val == "O" && second_val == "O" && third_val == " "
+#       return line[0]
+#     else
+#       return nil
+#     end
+#   end
+# end
 
 def computer_places_piece!(brd)
   if detect_risk_location(brd) != nil
     square = detect_risk_location(brd)
     brd[square] = COMPUTER_MARKER
-  #  binding.pry
-  elsif detect_winner(brd) != nil
-    square = detect_winning_move(brd)
-    brd[square] = COMPUTER_MARKER
+  # elsif detect_winner(brd) != nil
+  #   square = detect_winning_move(brd)
+  #   brd[square] = COMPUTER_MARKER
   else
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
@@ -163,17 +162,19 @@ loop do
 
   # scoring
   if detect_winner(board) == 'Player'
-   player_score = player_score + 1
-   player_score
+    player_score = player_score + 1
+    #player_score
   elsif detect_winner(board) == 'Computer'
     computer_score = computer_score + 1
     computer_score
-  break if player_score == 5 || computer_score == 5
- end
+  end
 
+  if player_score == 5 || computer_score == 5
+    break
+  end
+  
   puts "The player's score is #{player_score}"
   puts "The computer's score is #{computer_score}"
-
 
   prompt "Play again? (y or n)"
   answer = gets.chomp
