@@ -15,6 +15,9 @@ RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[5, 9, 1], [5, 7, 3]] +
                 [[3, 5, 7], [7, 5, 3]]               
 
+
+FIRST_MOVE = ["Player", "Computer", "Choose"]
+
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -97,7 +100,7 @@ def detect_computer_win(brd)
 end
 
 def computer_places_piece!(brd)
-  if detect_computer_win(brd) != nil
+  if detect_computer_win(brd) != nil 
     brd[detect_computer_win(brd)] = COMPUTER_MARKER
   elsif detect_risk_location(brd) != nil
     brd[detect_risk_location(brd)] = COMPUTER_MARKER
@@ -133,16 +136,31 @@ end
 player_score = 0
 computer_score = 0
 
+
 loop do
   board = initialize_board
 
-  loop do
-    display_board(board)
+  puts "Pick a choice from #{FIRST_MOVE}"
+  choice = gets.chomp
+  if choice == "Player"
+    loop do
+      display_board(board)
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
+  
+  elsif choice == "Computer"
+    loop do
+      computer_places_piece!(board)
+      display_board(board)
+      break if someone_won?(board) || board_full?(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+     end
+
   end
 
   display_board(board)
