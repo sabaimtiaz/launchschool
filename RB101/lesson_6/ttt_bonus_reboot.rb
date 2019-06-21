@@ -75,6 +75,15 @@ def player_places_piece!(brd) # method that is going to modify this board
   brd[square] = PLAYER_MARKER
 end
 
+current_player = ' '
+def place_piece!(brd) 
+  if current_player == "Player"
+    player_places_piece!
+  elsif current_player == "Computer"
+    computer_places_piece!
+  end
+end
+
 def detect_risk_location(brd)
   RISK_LINES.each do |line|
     first_val = brd[line[0]]
@@ -142,6 +151,19 @@ loop do
 
   puts "Pick a choice from #{FIRST_MOVE}"
   choice = gets.chomp
+  
+
+  
+    puts "choice is invalid"
+  end
+
+  current_player == choice
+
+  if choice == "Choose"
+    puts "Pick between Player and Computer"
+    choice = gets.chomp
+  end
+
   if choice == "Player"
     loop do
       display_board(board)
@@ -154,9 +176,10 @@ loop do
   
   elsif choice == "Computer"
     loop do
-      computer_places_piece!(board)
       display_board(board)
+      computer_places_piece!(board)
       break if someone_won?(board) || board_full?(board)
+
       player_places_piece!(board)
       break if someone_won?(board) || board_full?(board)
      end
