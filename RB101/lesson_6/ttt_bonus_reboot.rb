@@ -56,7 +56,6 @@ end
 def initialize_board
   new_board = {}
   (1..9).each { |num| new_board[num] = INITIAL_MARKER }
-  # create a new keyvalue pair in a hash
   new_board
 end
 
@@ -64,7 +63,7 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def player_places_piece!(brd) # method that is going to modify this board
+def player_places_piece!(brd)
   square = ''
   loop do
     prompt "Choose a square (#{joinor(empty_squares(brd))})"
