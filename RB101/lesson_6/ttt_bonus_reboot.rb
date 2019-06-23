@@ -3,18 +3,17 @@ require 'pry'
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = '0'
-WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
-                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
-                [[1, 5, 9], [3, 5, 7]] # diagonals
-
-RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + 
+WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + 
-                [[1, 5, 9], [3, 5, 7]] + 
-                [[2, 3, 1], [5, 6, 4], [8, 9, 7]] + 
+                [[1, 5, 9], [3, 5, 7]]
+
+RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+                [[1, 5, 9], [3, 5, 7]] +
+                [[2, 3, 1], [5, 6, 4], [8, 9, 7]] +
                 [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
                 [[5, 9, 1], [5, 7, 3]] +
-                [[3, 5, 7], [7, 5, 3]]               
-
+                [[3, 5, 7], [7, 5, 3]]
 
 FIRST_MOVE = ["Player", "Computer", "Choose"]
 CHOICES = ["Player", "Computer"]
@@ -76,7 +75,7 @@ def player_places_piece!(brd) # method that is going to modify this board
   brd[square] = PLAYER_MARKER
 end
 
-def place_piece!(brd, current_player) 
+def place_piece!(brd, current_player)
   if current_player == "Player"
     player_places_piece!(brd)
   elsif current_player == "Computer"
@@ -86,9 +85,9 @@ end
 
 def alternate_player(current_player)
   if current_player == "Player"
-    return "Computer"
+    "Computer"
   elsif current_player == "Computer"
-    return "Player"
+    "Player"
   end
 end
 
@@ -117,9 +116,9 @@ def detect_computer_win(brd)
 end
 
 def computer_places_piece!(brd)
-  if detect_computer_win(brd) != nil 
+  if !detect_computer_win(brd).nil?
     brd[detect_computer_win(brd)] = COMPUTER_MARKER
-  elsif detect_risk_location(brd) != nil
+  elsif !detect_risk_location(brd).nil?
     brd[detect_risk_location(brd)] = COMPUTER_MARKER
   elsif brd[5] == " "
     brd[5] = COMPUTER_MARKER
@@ -177,7 +176,7 @@ loop do
     current_player = alternate_player(current_player)
     break if someone_won?(board) || board_full?(board)
   end
-  
+
   display_board(board)
 
   if someone_won?(board)
@@ -187,16 +186,16 @@ loop do
   end
 
   if detect_winner(board) == 'Player'
-    player_score = player_score + 1
+    player_score += 1
   elsif detect_winner(board) == 'Computer'
-    computer_score = computer_score + 1
+    computer_score += 1
     computer_score
   end
 
   if player_score == 5 || computer_score == 5
     break
   end
-  
+
   puts "The player's score is #{player_score}"
   puts "The computer's score is #{computer_score}"
 
