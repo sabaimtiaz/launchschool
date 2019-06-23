@@ -17,6 +17,7 @@ RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
 
 
 FIRST_MOVE = ["Player", "Computer", "Choose"]
+CHOICES = ["Player", "Computer"]
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -75,12 +76,19 @@ def player_places_piece!(brd) # method that is going to modify this board
   brd[square] = PLAYER_MARKER
 end
 
-current_player = ' '
-def place_piece!(brd) 
+def place_piece!(brd, current_player) 
   if current_player == "Player"
-    player_places_piece!
+    player_places_piece!(brd)
   elsif current_player == "Computer"
-    computer_places_piece!
+    computer_places_piece!(brd)
+  end
+end
+
+def alternate_player(current_player)
+  if current_player == "Player"
+    return "Computer"
+  elsif current_player == "Computer"
+    return "Player"
   end
 end
 
@@ -128,9 +136,6 @@ def someone_won?(brd)
   !!detect_winner(brd)
 end
 
-board = initialize_board
-display_board(board)
-
 def detect_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
@@ -142,50 +147,37 @@ def detect_winner(brd)
   nil
 end
 
+board = initialize_board
+display_board(board)
+
 player_score = 0
 computer_score = 0
 
-
 loop do
   board = initialize_board
+  choice = nil
+  current_player = nil
 
-  puts "Pick a choice from #{FIRST_MOVE}"
-  choice = gets.chomp
-  
-
-  
-    puts "choice is invalid"
+  loop do
+    prompt "Pick a choice from #{FIRST_MOVE}"
+    choice = gets.chomp
+    break if FIRST_MOVE.include?(choice)
+    prompt "That is an invalid choice. Choose again."
   end
-
-  current_player == choice
 
   if choice == "Choose"
-    puts "Pick between Player and Computer"
-    choice = gets.chomp
+    choice = CHOICES.sample
   end
 
-  if choice == "Player"
-    loop do
-      display_board(board)
+  current_player = choice
 
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-    end
+  loop do
+    display_board(board)
+    place_piece!(board, current_player)
+    current_player = alternate_player(current_player)
+    break if someone_won?(board) || board_full?(board)
+  end
   
-  elsif choice == "Computer"
-    loop do
-      display_board(board)
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-     end
-
-  end
-
   display_board(board)
 
   if someone_won?(board)
@@ -194,10 +186,8 @@ loop do
     prompt "It's a tie!"
   end
 
-  # scoring
   if detect_winner(board) == 'Player'
     player_score = player_score + 1
-    #player_score
   elsif detect_winner(board) == 'Computer'
     computer_score = computer_score + 1
     computer_score
