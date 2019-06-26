@@ -195,8 +195,8 @@ loop do
     break
   end
 
-  puts "The player's score is #{player_score}"
-  puts "The computer's score is #{computer_score}"
+  prompt "The player's score is #{player_score}"
+  prompt "The computer's score is #{computer_score}"
 
   prompt "Play again? (y or n)"
   answer = gets.chomp
