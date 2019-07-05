@@ -5,7 +5,7 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]]
 
-RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+GAMEPLAY_MOVES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]] +
                 [[2, 3, 1], [5, 6, 4], [8, 9, 7]] +
@@ -16,7 +16,7 @@ RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
 FIRST_MOVE = ["p", "c", "s"]
 CHOICES = ["p", "c"]
 
-
+require 'pry'
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -90,35 +90,18 @@ def alternate_player(current_player)
   end
 end
 
-def detect_risk_location(brd)
-  RISK_LINES.each do |line|
-    first_val = brd[line[0]]
-    second_val = brd[line[1]]
-    third_val = brd[line[2]]
-    if first_val == "X" && second_val == "X" && third_val == " "
+def computer_move(brd)
+  GAMEPLAY_MOVES.each do |line|
+    if brd[line[0..1]] == PLAYER_MARKER || brd[line[0..1]] == COMPUTER_MARKER
       return line[2]
     end
     return nil
   end
 end
-
-def detect_computer_win(brd)
-  RISK_LINES.each do |line|
-    first_val = brd[line[0]]
-    second_val = brd[line[1]]
-    third_val = brd[line[2]]
-    if first_val == "O" && second_val == "O" && third_val == " "
-      return line[2]
-    end
-    return nil
-  end
-end
-
+    
 def computer_places_piece!(brd)
-  if !detect_computer_win(brd).nil?
-    brd[detect_computer_win(brd)] = COMPUTER_MARKER
-  elsif !detect_risk_location(brd).nil?
-    brd[detect_risk_location(brd)] = COMPUTER_MARKER
+  if !computer_move(brd).nil?
+    brd[computer_move(brd)] = COMPUTER_MARKER
   elsif brd[5] == " "
     brd[5] = COMPUTER_MARKER
   else
@@ -182,28 +165,28 @@ loop do
   display_board(board)
 
   if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
+    prompt "It's a win!"
   else
     prompt "It's a tie!"
   end
 
-  if detect_winner(board) == 'p'
+  winner = ' '
+  detect_winner(board) == winner
+
+  if winner == 'p'
     player_score += 1
-  elsif detect_winner(board) == 'c'
+  elsif winner == 'c'
     computer_score += 1
     computer_score
-  end
-
-  if player_score == 5 || computer_score == 5
-    break
+    break if player_score == 5 || computer_score == 5
   end
 
   prompt "The player's score is #{player_score}"
   prompt "The computer's score is #{computer_score}"
 
-  prompt "Play again? (y or n)"
+  prompt "Play again? (enter n for no, any other letter to continue)"
   answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  break if answer.downcase.start_with?('n')
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye!"
