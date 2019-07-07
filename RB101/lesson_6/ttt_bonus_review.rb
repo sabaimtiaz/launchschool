@@ -5,13 +5,13 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]]
 
-GAMEPLAY_MOVES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
-                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
-                [[1, 5, 9], [3, 5, 7]] +
-                [[2, 3, 1], [5, 6, 4], [8, 9, 7]] +
-                [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
-                [[5, 9, 1], [5, 7, 3]] +
-                [[3, 5, 7], [7, 5, 3]]
+GAMEPLAY_MOVES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+                 [[1, 5, 9], [3, 5, 7]] +
+                 [[2, 3, 1], [5, 6, 4], [8, 9, 7]] +
+                 [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
+                 [[5, 9, 1], [5, 7, 3]] +
+                 [[3, 5, 7], [7, 5, 3]]
 
 FIRST_MOVE = ["p", "c", "s"]
 CHOICES = ["p", "c"]
@@ -21,6 +21,7 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+# rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 def display_board(brd)
   system 'clear'
   puts "Welcome to Tic Tac Toe!"
@@ -39,6 +40,7 @@ def display_board(brd)
   puts "       |       |"
   puts ""
 end
+# rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
 def joinor(array)
   if array.empty?
@@ -98,7 +100,7 @@ def computer_move(brd)
     return nil
   end
 end
-    
+
 def computer_places_piece!(brd)
   if !computer_move(brd).nil?
     brd[computer_move(brd)] = COMPUTER_MARKER
@@ -145,7 +147,7 @@ loop do
     prompt "Enter c to make the Computer play first."
     prompt "Enter s for the computer to select a player."
     choice = gets.chomp
-    break if FIRST_MOVE.include?(choice) 
+    break if FIRST_MOVE.include?(choice)
     prompt "That is an invalid choice. Choose again."
   end
 
@@ -170,14 +172,12 @@ loop do
     prompt "It's a tie!"
   end
 
-  winner = ' '
-  detect_winner(board) == winner
+  winner = detect_winner(board)
 
   if winner == 'p'
     player_score += 1
   elsif winner == 'c'
     computer_score += 1
-    computer_score
     break if player_score == 5 || computer_score == 5
   end
 
