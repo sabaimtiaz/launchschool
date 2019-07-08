@@ -16,7 +16,6 @@ GAMEPLAY_MOVES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
 FIRST_MOVE = ["p", "c", "s"]
 CHOICES = ["p", "c"]
 
-require 'pry'
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -24,7 +23,6 @@ end
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 def display_board(brd)
   system 'clear'
-  puts "Welcome to Tic Tac Toe!"
   puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
   puts ""
   puts "       |       |"
@@ -136,11 +134,13 @@ display_board(board)
 player_score = 0
 computer_score = 0
 
+prompt "Welcome to Tic Tac Toe!"
+
 loop do
   board = initialize_board
   choice = nil
   current_player = nil
-  prompt "Decide who goes first!"
+  prompt "Choose who begins:"
 
   loop do
     prompt "Enter p for the Player to go first."
@@ -186,7 +186,7 @@ loop do
 
   prompt "Play again? (enter n for no, any other letter to continue)"
   answer = gets.chomp
-  break if answer.downcase.start_with?('n')
+  break if answer == 'n'
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye!"
