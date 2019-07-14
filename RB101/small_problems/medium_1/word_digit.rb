@@ -5,11 +5,12 @@ def word_to_digit(input)
     DIGITS_TO_WORDS.keys.each do |word|
        input.gsub!(/#{word}/, DIGITS_TO_WORDS[word])
     end
+    #further exploration
     input.to_s.split(' ').each do |word|
-        output << word + " " if /[a-z]/.match(word)
-        output << word if DIGITS_TO_WORDS.values.include?(word)
+        output << word + " " if /[a-z]/.match(word) || /[[:punct:]]/.match(word)  
+        output << word if DIGITS_TO_WORDS.values.include?(word) 
     end
-    output
+    output.strip
 end
-p word_to_digit("pls call a one two five nine")
-
+p word_to_digit("pls call at one two five nine!")
+p word_to_digit('Please call me at five five five one two three four. Thanks.') 
