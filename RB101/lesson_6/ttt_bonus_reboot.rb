@@ -1,3 +1,4 @@
+
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = '0'
@@ -5,40 +6,38 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]]
 
-GAMEPLAY_MOVES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
-                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
-                 [[1, 5, 9], [3, 5, 7]] +
-                 [[2, 3, 1], [5, 6, 4], [8, 9, 7]] +
-                 [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
-                 [[5, 9, 1], [5, 7, 3]] +
-                 [[3, 5, 7], [7, 5, 3]]
+RISK_LINES =    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+                [[1, 5, 9], [3, 5, 7]] +
+                [[2, 3, 1], [5, 6, 4], [8, 9, 7]] +
+                [[4, 7, 1], [5, 8, 2], [6, 9, 3]] +
+                [[5, 9, 1], [5, 7, 3]] +
+                [[3, 5, 7], [7, 5, 3]]
 
-FIRST_MOVE = ["p", "c", "s"]
-CHOICES = ["p", "c"]
+FIRST_MOVE = ["Player", "Computer", "Choose"]
+CHOICES = ["Player", "Computer"]
 
 def prompt(msg)
   puts "=> #{msg}"
 end
 
-# rubocop:disable Metrics/AbcSize
 def display_board(brd)
   system 'clear'
   puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
   puts ""
   puts "       |       |"
-  puts "   #{brd[1]}   |   #{brd[2]}   |  #{brd[3]}"
+  puts "   #{brd[1]}   |  #{brd[2]}    | #{brd[3]}"
   puts "       |       |"
   puts "-------+-------+------"
   puts "       |       |"
-  puts "   #{brd[4]}   |   #{brd[5]}   |  #{brd[6]}"
+  puts "   #{brd[4]}   |  #{brd[5]}    | #{brd[6]}"
   puts "       |       |"
   puts "-------+-------+------"
   puts "       |       |"
-  puts "   #{brd[7]}   |   #{brd[8]}   |  #{brd[9]}"
+  puts "   #{brd[7]}   |  #{brd[8]}    | #{brd[9]}"
   puts "       |       |"
   puts ""
 end
-# rubocop:enable Metrics/AbcSize
 
 def joinor(array)
   if array.empty?
@@ -75,24 +74,39 @@ def player_places_piece!(brd)
 end
 
 def place_piece!(brd, current_player)
-  if current_player == "p"
+  if current_player == "Player"
     player_places_piece!(brd)
-  elsif current_player == "c"
+  elsif current_player == "Computer"
     computer_places_piece!(brd)
   end
 end
 
 def alternate_player(current_player)
-  if current_player == "p"
-    "c"
-  elsif current_player == "c"
-    "p"
+  if current_player == "Player"
+    "Computer"
+  elsif current_player == "Computer"
+    "Player"
   end
 end
 
-def computer_move(brd, marker)
-  GAMEPLAY_MOVES.each do |line|
-    if brd[line[0]] == marker && brd[line[1]] == marker
+def detect_risk_location(brd)
+  RISK_LINES.each do |line|
+    first_val = brd[line[0]]
+    second_val = brd[line[1]]
+    third_val = brd[line[2]]
+    if first_val == "X" && second_val == "X" && third_val == " "
+      return line[2]
+    end
+    return nil
+  end
+end
+
+def detect_computer_win(brd)
+  RISK_LINES.each do |line|
+    first_val = brd[line[0]]
+    second_val = brd[line[1]]
+    third_val = brd[line[2]]
+    if first_val == "O" && second_val == "O" && third_val == " "
       return line[2]
     end
     return nil
@@ -100,13 +114,10 @@ def computer_move(brd, marker)
 end
 
 def computer_places_piece!(brd)
-  attack_square = computer_move(brd, COMPUTER_MARKER)
-  risk_square = computer_move(brd, PLAYER_MARKER)
-
-  if attack_square
-    brd[attack_square] = COMPUTER_MARKER
-  elsif risk_square
-    brd[risk_square] = COMPUTER_MARKER
+  if !detect_computer_win(brd).nil?
+    brd[detect_computer_win(brd)] = COMPUTER_MARKER
+  elsif !detect_risk_location(brd).nil?
+    brd[detect_risk_location(brd)] = COMPUTER_MARKER
   elsif brd[5] == " "
     brd[5] = COMPUTER_MARKER
   else
@@ -125,9 +136,9 @@ end
 def detect_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
-      return 'p'
+      return 'Player'
     elsif brd.values_at(*line).count(COMPUTER_MARKER) == 3
-      return 'c'
+      return 'Computer'
     end
   end
   nil
@@ -139,24 +150,19 @@ display_board(board)
 player_score = 0
 computer_score = 0
 
-prompt "Welcome to Tic Tac Toe!"
-
 loop do
   board = initialize_board
   choice = nil
   current_player = nil
-  prompt "Choose who begins:"
 
   loop do
-    prompt "Enter p for the Player to go first."
-    prompt "Enter c to make the Computer play first."
-    prompt "Enter s for the computer to select a player."
+    prompt "Pick a choice from #{FIRST_MOVE}"
     choice = gets.chomp
     break if FIRST_MOVE.include?(choice)
     prompt "That is an invalid choice. Choose again."
   end
 
-  if choice == "s"
+  if choice == "Choose"
     choice = CHOICES.sample
   end
 
@@ -172,26 +178,28 @@ loop do
   display_board(board)
 
   if someone_won?(board)
-    prompt "It's a win!"
+    prompt "#{detect_winner(board)} won!"
   else
     prompt "It's a tie!"
   end
 
-  winner = detect_winner(board)
-
-  if winner == 'p'
+  if detect_winner(board) == 'Player'
     player_score += 1
-  elsif winner == 'c'
+  elsif detect_winner(board) == 'Computer'
     computer_score += 1
-    break if player_score == 5 || computer_score == 5
+    computer_score
+  end
+
+  if player_score == 5 || computer_score == 5
+    break
   end
 
   prompt "The player's score is #{player_score}"
   prompt "The computer's score is #{computer_score}"
 
-  prompt "Play again? (enter n for no, any other letter to continue)"
+  prompt "Play again? (y or n)"
   answer = gets.chomp
-  break if answer == 'n'
+  break unless answer.downcase.start_with?('y')
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye!"

@@ -94,10 +94,10 @@ def computer_move(brd, marker)
   GAMEPLAY_MOVES.each do |line|
     if brd[line[0]] == marker && brd[line[1]] == marker
       return line[2]
-     end
-     return nil
-   end
- end
+    end
+    return nil
+  end
+end
 
 def computer_places_piece!(brd)
   attack_square = computer_move(brd, COMPUTER_MARKER)
