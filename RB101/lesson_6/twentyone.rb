@@ -56,7 +56,7 @@ def player_busted?(cards)
 end
 
 def dealer_busted?(cards)
-  total(cards) == 17
+  total(cards) >= 17
 end
 
 loop do
@@ -70,28 +70,25 @@ loop do
         break
       end
     elsif player_answer == "stay"
-      prompt "It's time for the dealer to play"
-    end
-  loop do
-    prompt "Dealer, hit or stay?"
-    dealer_answer = gets.chomp
-    if dealer_answer == "hit"
-      dealer_cards << DECK.sample(1) + suits.sample(1)
-      if !!dealer_busted?(dealer_cards)
-        prompt "Dealer's a bust. Player wins"
-        break
-      end
-    elsif dealer_answer == "stay"
-      prompt "Dealer stays"
-      break
-    elsif dealer_answer == "stay" && player_answer == "stay"
-      if total(player_cards) > total(dealer_cards)
-        prompt "Player wins because its total #{total(player_cards)} is greater than dealer's total"
-      else
-        prompt "Dealer wins"
-        break
+      prompt "Dealer, hit or stay?"
+      dealer_answer = gets.chomp
+      if dealer_answer == "hit"
+        dealer_cards << DECK.sample(1) + suits.sample(1)
+        if !!dealer_busted?(dealer_cards)
+          prompt "Dealer's a bust. Player wins"
+          break
+        end
+      elsif dealer_answer == "stay"
+        prompt "Dealer stays"
       end
     end
-  end
-  break if player_cards.length + dealer_cards.length == 52
 end
+
+      # if dealer_answer == "stay" && player_answer == "stay"
+      # if total(player_cards) > total(dealer_cards)
+      #   prompt "Player wins because its total #{total(player_cards)} is greater than dealer's total"
+      # else
+      #   prompt "Dealer wins"
+      #   break
+      # end
+
