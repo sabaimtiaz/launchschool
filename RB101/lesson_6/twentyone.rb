@@ -1,18 +1,15 @@
 
 DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
-suits = %w[hearts diamonds clubs spades]
-num_of_cards = 52
-
+SUITS = %w[hearts diamonds clubs spades]
 
 def prompt(msg)
   puts "=> #{msg}"
 end
 
-def generate(gamecards)
+def generate(cards)
   cards = []
-  2.times do
-    cards << DECK.sample(1) + suits.sample(1)
-  end
+  cards << DECK.sample(1) + SUITS.sample(1)
+  cards << DECK.sample(1) + SUITS.sample(1)
 end
 
 def total(gamecards)
@@ -36,19 +33,27 @@ end
 
 prompt "Welcome to Twenty One!"
 
-# deal cards
+# # deal cards
+# player_cards = []
+#   2.times do
+#     player_cards << DECK.sample(1) + suits.sample(1) 
+#   end
+# player_cards
+
+# dealer_cards = []
+#   2.times do
+#     dealer_cards << DECK.sample(1) + suits.sample(1) 
+#   end
+# dealer_cards
+# prompt "Dealer has #{dealer_cards.sample(1)}"
+
+
 player_cards = []
-  2.times do
-    player_cards << DECK.sample(1) + suits.sample(1) 
-  end
-player_cards
+player_cards = generate(player_cards)
 prompt "You have #{player_cards} and the total is #{total(player_cards)}"
 
 dealer_cards = []
-  2.times do
-    dealer_cards << DECK.sample(1) + suits.sample(1) 
-  end
-dealer_cards
+dealer_cards = generate(dealer_cards)
 prompt "Dealer has #{dealer_cards.sample(1)}"
 
 def player_busted?(cards)
@@ -63,8 +68,8 @@ loop do
     prompt "Player, hit or stay?"
     player_answer = gets.chomp
     if player_answer == "hit"
-      player_cards << DECK.sample(1) + suits.sample(1)
-      prompt "Your cards are now #{player_cards} and the sum is #{total(player_cards)}"
+      player_cards << DECK.sample(1) + SUITS.sample(1)
+      prompt "Your cards are now #{player_cards} which comes to a total of #{total(player_cards)}"
       if !!player_busted?(player_cards)
         prompt "Player's a bust. Dealer wins."
         break
@@ -73,10 +78,10 @@ loop do
       prompt "Dealer, hit or stay?"
       dealer_answer = gets.chomp
       if dealer_answer == "hit"
-        dealer_cards << DECK.sample(1) + suits.sample(1)
+        dealer_cards << DECK.sample(1) + SUITS.sample(1)
         if !!dealer_busted?(dealer_cards)
           prompt "Dealer's a bust."
-          prompt "Player's total #{total(player_cards)} is greater than dealer's total #{total(dealer_cards)}"
+          prompt "Player's total #{total(player_cards)} is greater than dealer's total of #{total(dealer_cards)}"
           break
         end
       elsif dealer_answer == "stay"
