@@ -75,7 +75,8 @@ loop do
       if dealer_answer == "hit"
         dealer_cards << DECK.sample(1) + suits.sample(1)
         if !!dealer_busted?(dealer_cards)
-          prompt "Dealer's a bust. Player wins"
+          prompt "Dealer's a bust."
+          prompt "Player's total #{total(player_cards)} is greater than dealer's total #{total(dealer_cards)}"
           break
         end
       elsif dealer_answer == "stay"
