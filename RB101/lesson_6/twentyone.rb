@@ -29,15 +29,13 @@ def total(gamecards)
   sum
 end
 
-prompt "Welcome to Twenty One!"
-
-player_cards = []
-player_cards = generate(player_cards)
-prompt "You have #{player_cards} and the total is #{total(player_cards)}"
-
-dealer_cards = []
-dealer_cards = generate(dealer_cards)
-prompt "Dealer has #{dealer_cards.sample(1)}"
+def format_string(array)
+  string = ''
+  array.each do |element|
+    string << "#{element[0]}, "
+  end
+  string.slice(0..-3)
+end
 
 def player_busted?(cards)
   total(cards) >= 21
@@ -47,28 +45,34 @@ def dealer_busted?(cards)
   total(cards) >= 17
 end
 
+prompt "Welcome to Twenty One!"
+
+player_cards = []
+player_cards = generate(player_cards)
+prompt "You have #{player_cards[0][0]} and #{player_cards[1][0]}."
+
+dealer_cards = []
+dealer_cards = generate(dealer_cards)
+prompt "Dealer has #{dealer_cards[0][0]} and unknown card."
+
 loop do
   prompt "Player, hit or stay?"
   player_answer = gets.chomp
+  loop do
+    break if player_answer != "hit" || player_answer != "stay"
+  end
   if player_answer == "hit"
     player_cards << DECK.sample(1) + SUITS.sample(1)
-    prompt "You now have #{player_cards} equal to #{total(player_cards)}"
+    prompt "You now have #{format_string(player_cards)}."
     if !!player_busted?(player_cards)
       prompt "Player's a bust. Dealer wins."
       break
     end
   elsif player_answer == "stay"
-    prompt "Dealer, hit or stay?"
-    dealer_answer = gets.chomp
-    if dealer_answer == "hit"
-      dealer_cards << DECK.sample(1) + SUITS.sample(1)
-      if !!dealer_busted?(dealer_cards)
-        prompt "Dealer's a bust."
-        prompt "Player total #{total(player_cards)} is more than dealer #{total(dealer_cards)}"
-        break
-      end
-    elsif dealer_answer == "stay"
-      prompt "Dealer stays"
+    dealer_cards << DECK.sample(1) + SUITS.sample(1) if dealer_cards != 17
+    if !!dealer_busted?(dealer_cards)
+      prompt "Dealer's a bust. Player wins."
+      break
     end
   end
 end
