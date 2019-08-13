@@ -1,3 +1,4 @@
+require 'pry'
 DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
 
@@ -45,6 +46,18 @@ def dealer_busted?(cards)
   total(cards) >= 17
 end
 
+def dealer_result(cards)
+  if !!dealer_busted?(cards)
+    prompt "Dealer's a bust. Player wins."
+  end
+end
+
+def player_result(cards)
+  if !!player_busted?(cards)
+    prompt "Player's a bust. Dealer wins."
+  end
+end
+    
 prompt "Welcome to Twenty One!"
 
 player_cards = []
@@ -52,7 +65,7 @@ player_cards = generate(player_cards)
 prompt "You have #{player_cards[0][0]} and #{player_cards[1][0]}."
 
 dealer_cards = []
-dealer_cards = generate(dealer_cards)
+dealer_cards = generate(dealer_cards) 
 prompt "Dealer has #{dealer_cards[0][0]} and unknown card."
 
 loop do
@@ -65,14 +78,21 @@ loop do
     player_cards << DECK.sample(1) + SUITS.sample(1)
     prompt "You now have #{format_string(player_cards)}."
     if !!player_busted?(player_cards)
-      prompt "Player's a bust. Dealer wins."
+      player_result(player_cards)
       break
     end
-  elsif player_answer == "stay"
-    dealer_cards << DECK.sample(1) + SUITS.sample(1) if dealer_cards != 17
+  elsif player_answer == "stay" && total(dealer_cards) <= 17 
+    dealer_cards << DECK.sample(1) + SUITS.sample(1)
     if !!dealer_busted?(dealer_cards)
-      prompt "Dealer's a bust. Player wins."
+      dealer_result(dealer_cards)
       break
     end
+  elsif total(dealer_cards) > 17 && player_answer == "stay"
+    if total(dealer_cards) > total(player_cards)
+      prompt "Dealer's total is higher."
+    else
+      prompt "Player's total is higher."
+    end
+    break
   end
 end
