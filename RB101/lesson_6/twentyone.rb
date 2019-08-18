@@ -69,6 +69,8 @@ dealer_cards = generate(dealer_cards)
 prompt "Dealer has #{dealer_cards[0][0]} and unknown card."
 
 loop do
+  dealer_total = total(dealer_cards) 
+  player_total = total(player_cards)
   prompt "Player, hit or stay?"
   player_answer = gets.chomp
   loop do
@@ -81,14 +83,17 @@ loop do
       player_result(player_cards)
       break
     end
-  elsif player_answer == "stay" && total(dealer_cards) <= 17 
+  elsif player_answer == "stay" && dealer_total <= 17 
+    prompt "Dealer will play now..."
+    Kernel.sleep(1)
     dealer_cards << DECK.sample(1) + SUITS.sample(1)
     if !!dealer_busted?(dealer_cards)
       dealer_result(dealer_cards)
       break
     end
-  elsif total(dealer_cards) > 17 && player_answer == "stay"
-    if total(dealer_cards) > total(player_cards)
+  elsif dealer_total > 17 && player_answer == "stay"
+    prompt "Dealer stayed."
+    if dealer_total > player_total
       prompt "Dealer's total is higher."
     else
       prompt "Player's total is higher."
