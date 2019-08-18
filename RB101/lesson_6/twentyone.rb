@@ -59,7 +59,6 @@ def player_result(cards)
 end
     
 prompt "Welcome to Twenty One!"
-# clear screen here
 player_cards = []
 player_cards = generate(player_cards)
 prompt "You have #{player_cards[0][0]} and #{player_cards[1][0]}."
@@ -74,6 +73,7 @@ loop do
   loop do
     prompt "Player, hit or stay?"
     player_answer = gets.chomp
+    system "clear"
     break if player_answer == "hit" || player_answer == "stay"
     prompt "Please enter a correct option: hit or stay."
   end
@@ -95,8 +95,7 @@ loop do
   elsif dealer_total > 17 && player_answer == "stay"
     prompt "Dealer stayed."
     if dealer_total > player_total
-      prompt "Dealer's total is higher."
-      # dealer had xxx and you had xxx
+      prompt "Dealer's total #{dealer_total} is higher."
     else
       prompt "Player's total is higher."
     end
