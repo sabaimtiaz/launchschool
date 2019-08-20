@@ -57,18 +57,26 @@ def player_result(cards)
     prompt "Player's a bust. Dealer wins."
   end
 end
-    
+
+
+def play_again?
+  puts "-------------"
+  prompt "Do you want to play again? (y or n)"
+  answer = gets.chomp
+  answer.downcase.start_with?('y')
+end
+
 prompt "Welcome to Twenty One!"
 player_cards = []
 player_cards = generate(player_cards)
 prompt "You have #{player_cards[0][0]} and #{player_cards[1][0]}."
 
 dealer_cards = []
-dealer_cards = generate(dealer_cards) 
+dealer_cards = generate(dealer_cards)
 prompt "Dealer has #{dealer_cards[0][0]} and unknown card."
 player_answer = ''
 loop do
-  dealer_total = total(dealer_cards) 
+  dealer_total = total(dealer_cards)
   player_total = total(player_cards)
   loop do
     prompt "Player, hit or stay?"
@@ -82,15 +90,15 @@ loop do
     prompt "You now have #{format_string(player_cards)}."
     if !!player_busted?(player_cards)
       player_result(player_cards)
-      break
+      break unless play_again?
     end
-  elsif player_answer == "stay" && dealer_total <= 17 
+  elsif player_answer == "stay" && dealer_total <= 17
     prompt "Dealer will play now..."
     Kernel.sleep(1)
     dealer_cards << DECK.sample(1) + SUITS.sample(1)
     if !!dealer_busted?(dealer_cards)
       dealer_result(dealer_cards)
-      break
+      break unless play_again?
     end
   elsif dealer_total > 17 && player_answer == "stay"
     prompt "Dealer stayed."
@@ -102,3 +110,5 @@ loop do
     break
   end
 end
+prompt "Thank you for playing Twenty One! Goodbye!"
+
