@@ -1,8 +1,7 @@
-
 DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
-   player_win = 0
-  dealer_win = 0
+player_win = 0
+dealer_win = 0
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -51,12 +50,14 @@ end
 def dealer_result(cards)
   if !!dealer_busted?(cards)
     prompt "Dealer's a bust. Player wins."
+    prompt "Dealer had #{format_string(cards)} equal to #{total(cards)}"
   end
 end
 
 def player_result(cards)
   if !!player_busted?(cards)
     prompt "Player's a bust. Dealer wins."
+    prompt "Player had #{format_string(cards)} equal to #{total(cards)}"
   end
 end
 
@@ -64,14 +65,16 @@ def play_again?
   puts "-------------"
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
+  system "clear"
   answer.downcase.start_with?('y')
 end
 
-def round_output(cards)
-    prompt "Loser had #{format_string(cards)} equal to #{total(cards)}"
-end
-
 loop do
+  if player_win == 5 || dealer_win == 5
+    prompt "Five wins. Game over."
+    break
+  end
+
   prompt "Welcome to Twenty One!"
   player_cards = []
   dealer_cards = []
@@ -81,9 +84,8 @@ loop do
   prompt "You have #{player_cards[0][0]} and #{player_cards[1][0]}."
   prompt "Dealer has #{dealer_cards[0][0]} and unknown card."
 
-  prompt "The dealer's score is #{dealer_win}"
-  prompt "The player's score is #{player_win}"
-
+  prompt "Player wins are #{player_win}"
+  prompt "Dealer wins are #{dealer_win}"
   dealer_total = total(dealer_cards)
   player_total = total(player_cards)
 
@@ -100,35 +102,32 @@ loop do
       player_cards << DECK.sample(1) + SUITS.sample(1)
       prompt "You now have #{format_string(player_cards)}."
     end
-    break if player_busted?(player_cards) || player_answer == "stay"
+    break if player_busted?(player_cards) || player_answer == "stay" 
   end
 
   if player_busted?(player_cards)
-    dealer_win +=1
     player_result(player_cards)
-    round_output(player_cards)
+    dealer_win += 1
     play_again? ? next : break 
   else
     prompt "You stayed at #{player_total}"
   end
-    #break if dealer_total >= 17
-    prompt "Dealer will play now..."
-    Kernel.sleep(1)
-    dealer_cards << DECK.sample(1) + SUITS.sample(1)
-    prompt "Dealer has #{format_string(dealer_cards)}."
-    if dealer_busted?(dealer_cards)
-      player_win +=1
-      dealer_result(dealer_cards)
-      round_output(dealer_cards)
-      play_again? ? next : break
-    else
-      dealer_total = total(dealer_cards)
-      prompt "Dealer stayed at #{dealer_total}"
-    end
-  # prompt "Player has #{format_string(player_cards)}, equal to #{player_total}."
-  # prompt "Dealer has #{format_string(dealer_cards)}, equal to #{dealer_total}."
- 
-  break unless play_again?  
+
+  # dealer turn
+  prompt "Dealer will play now..."
+  Kernel.sleep(1)
+  dealer_cards << DECK.sample(1) + SUITS.sample(1)
+  prompt "Dealer has #{format_string(dealer_cards)}."
+
+  if dealer_busted?(dealer_cards)
+    player_win += 1
+    dealer_result(dealer_cards)
+    play_again? ? next : break
+  else
+    dealer_total = total(dealer_cards)
+    prompt "Dealer stayed at #{dealer_total}"
+  end
+  break unless play_again? 
   system "clear"
 end
 
