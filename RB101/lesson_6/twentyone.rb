@@ -1,6 +1,6 @@
-DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
+VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
-TOURNAMENT_MAX = 2
+TOURNAMENT_MAX = 5
 player_wins = 0
 dealer_wins = 0
 
@@ -8,14 +8,12 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-def generate(cards)
-  cards = []
-  cards << DECK.sample(1) + SUITS.sample(1)
-  cards << DECK.sample(1) + SUITS.sample(1)
+def initialize_deck
+  SUITS.product(VALUES).shuffle
 end
 
 def total(gamecards)
-  values = gamecards.map { |card| card[0] }
+  values = gamecards.map { |card| card[1] }
   sum = 0
   values.each do |value|
     if value == "jack" || value == "king" || value == "queen"
@@ -35,7 +33,7 @@ end
 def format_string(array)
   string = ''
   array.each do |element|
-    string << "#{element[0]}, "
+    string << "#{element[1]}, "
   end
   string.slice(0..-3)
 end
@@ -87,15 +85,19 @@ loop do
   system "clear" 
   prompt "Welcome to Twenty One!"
   prompt "This tournament is best of five games."
+  
+  deck = initialize_deck
   player_cards = []
   dealer_cards = []
-  player_cards = generate(player_cards)
-  dealer_cards = generate(dealer_cards)
+  2.times do
+    player_cards << deck.pop
+    dealer_cards << deck.pop
+  end
 
   puts "--------------------------------------------------------"
 
-  prompt "You have #{player_cards[0][0]} and #{player_cards[1][0]}."
-  prompt "Dealer has #{dealer_cards[0][0]} and unknown card."
+  prompt "You have #{player_cards[0][1]} and #{player_cards[1][1]}."
+  prompt "Dealer has #{dealer_cards[0][1]} and unknown card."
 
   puts "---------------------------------------------------------"
   prompt "Player's tournament score is #{player_wins}"
@@ -117,7 +119,7 @@ loop do
     end
     system "clear"
     if player_answer == "hit"
-      player_cards << DECK.sample(1) + SUITS.sample(1)
+      player_cards << deck.pop
       prompt "You now have #{format_string(player_cards)}."
     end
     break if busted?(player_cards) || player_answer == "stay" 
@@ -135,7 +137,7 @@ loop do
   loop do
     prompt "Dealer will play now..."
     Kernel.sleep(1)
-    dealer_cards << DECK.sample(1) + SUITS.sample(1)
+    dealer_cards << deck.pop
     prompt "Dealer has #{format_string(dealer_cards)}."
     
     if busted?(dealer_cards)
@@ -149,8 +151,10 @@ loop do
     break if busted?(dealer_cards) || dealer_total >= 17 
   end
 
+  dealer_total = total(dealer_cards)
+
   puts "---------------------------------------------------------"
-  prompt "Player had #{format_string(player_cards)} equal to #{player_total}"
+  prompt "You had #{format_string(player_cards)} equal to #{player_total}"
   prompt "Dealer had #{format_string(dealer_cards)} equal to #{dealer_total}"
   puts "----------------------------------------------------------"
   wait_btwn_rounds
