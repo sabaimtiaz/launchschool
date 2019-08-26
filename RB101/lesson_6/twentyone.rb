@@ -1,9 +1,8 @@
-require 'pry'
 DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
 TOURNAMENT_MAX = 2
-player_win = 0
-dealer_win = 0
+player_wins = 0
+dealer_wins = 0
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -47,15 +46,13 @@ end
 
 def dealer_result(cards)
   if !!busted?(cards)
-    prompt "Dealer's a bust. Player wins."
-    prompt "Dealer had #{format_string(cards)} equal to #{total(cards)}"
+    prompt "Dealer's a bust. You win."
   end
 end
 
 def player_result(cards)
   if !!busted?(cards)
-    prompt "Player's a bust. Dealer wins."
-    prompt "Player had #{format_string(cards)} equal to #{total(cards)}"
+    prompt "You're a bust. Dealer wins."
   end
 end
 
@@ -79,10 +76,11 @@ def wait_btwn_rounds
   Kernel.sleep(1)
   prompt "Starting new game in 1..."
   Kernel.sleep(1)
+  puts "-----------"
 end
 
 loop do
-  if player_win == TOURNAMENT_MAX || dealer_win == TOURNAMENT_MAX
+  if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
     prompt "#{TOURNAMENT_MAX} wins. Game over."
     break
   end
@@ -100,8 +98,8 @@ loop do
   prompt "Dealer has #{dealer_cards[0][0]} and unknown card."
 
   puts "---------------------------------------------------------"
-  prompt "Player's tournament score is #{player_win}"
-  prompt "Dealer's tournament score is #{dealer_win}"
+  prompt "Player's tournament score is #{player_wins}"
+  prompt "Dealer's tournament score is #{dealer_wins}"
 
 
   dealer_total = total(dealer_cards)
@@ -127,10 +125,11 @@ loop do
 
   if busted?(player_cards)
     player_result(player_cards)
-    dealer_win += 1
+    dealer_wins += 1
   else
     prompt "You stayed at #{player_total}"
   end
+  player_total = total(player_cards)
   puts "--------------------------------"
   # dealer turn
   loop do
@@ -140,7 +139,7 @@ loop do
     prompt "Dealer has #{format_string(dealer_cards)}."
     
     if busted?(dealer_cards)
-      player_win += 1
+      player_wins += 1
       dealer_result(dealer_cards)
     else
       dealer_total = total(dealer_cards)
@@ -151,8 +150,8 @@ loop do
   end
 
   puts "---------------------------------------------------------"
-  prompt "Player's total was #{player_total} and the cards were #{format_string(player_cards)}"
-  prompt "Dealer's total was #{dealer_total} and the cards were #{format_string(dealer_cards)}"
+  prompt "Player had #{format_string(player_cards)} equal to #{player_total}"
+  prompt "Dealer had #{format_string(dealer_cards)} equal to #{dealer_total}"
   puts "----------------------------------------------------------"
   wait_btwn_rounds
 end
