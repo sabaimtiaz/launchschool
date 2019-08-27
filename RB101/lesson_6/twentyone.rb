@@ -58,12 +58,13 @@ def play_again?
   puts "-------------"
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
+  player_wins = 0
+  dealer_wins = 0
   system "clear"
   answer.downcase.start_with?('y')
 end
 
 def wait_btwn_rounds
-  puts "-----------"
   prompt "Starting new game in 5..."
   Kernel.sleep(1)
   prompt "Starting new game in 4..."
@@ -74,13 +75,14 @@ def wait_btwn_rounds
   Kernel.sleep(1)
   prompt "Starting new game in 1..."
   Kernel.sleep(1)
-  puts "-----------"
 end
 
 loop do
   if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
     prompt "#{TOURNAMENT_MAX} wins. Game over."
-    break
+    player_wins = 0
+    dealer_wins = 0
+    break unless play_again?
   end
   system "clear" 
   prompt "Welcome to Twenty One!"
@@ -95,10 +97,8 @@ loop do
   end
 
   puts "--------------------------------------------------------"
-
   prompt "You have #{player_cards[0][1]} and #{player_cards[1][1]}."
   prompt "Dealer has #{dealer_cards[0][1]} and unknown card."
-
   puts "---------------------------------------------------------"
   prompt "Player's tournament score is #{player_wins}"
   prompt "Dealer's tournament score is #{dealer_wins}"
@@ -106,7 +106,7 @@ loop do
 
   dealer_total = total(dealer_cards)
   player_total = total(player_cards)
-#
+
 # player turn
   loop do
     player_answer = ''
@@ -132,33 +132,35 @@ loop do
     prompt "You stayed at #{player_total}"
   end
   player_total = total(player_cards)
-  puts "--------------------------------"
+ # puts "------------------"
   # dealer turn
   loop do
-    prompt "Dealer will play now..."
-    Kernel.sleep(1)
-    dealer_cards << deck.pop
-    prompt "Dealer has #{format_string(dealer_cards)}."
-    
-    if busted?(dealer_cards)
-      player_wins += 1
-      dealer_result(dealer_cards)
-    else
-      dealer_total = total(dealer_cards)
-      prompt "Dealer stayed at #{dealer_total}"
-    end
+    if !busted?(player_cards)
+      prompt "Dealer will play now..."
+      Kernel.sleep(1)
+      dealer_cards << deck.pop
+      prompt "Dealer has #{format_string(dealer_cards)}."
+      
+      if busted?(dealer_cards)
+        player_wins += 1
+        dealer_result(dealer_cards)
+      else
+        dealer_total = total(dealer_cards)
+        prompt "Dealer stayed at #{dealer_total}"
+      end
 
-    break if busted?(dealer_cards) || dealer_total >= 17 
+      break if busted?(dealer_cards) || dealer_total >= 17 
+    end
+    break if busted?(player_cards)
   end
 
   dealer_total = total(dealer_cards)
 
-  puts "---------------------------------------------------------"
+  puts "------------------"
   prompt "You had #{format_string(player_cards)} equal to #{player_total}"
   prompt "Dealer had #{format_string(dealer_cards)} equal to #{dealer_total}"
-  puts "----------------------------------------------------------"
+  puts "-----------------"
   wait_btwn_rounds
 end
-
 
 prompt "Thank you for playing Twenty One! Good bye."
