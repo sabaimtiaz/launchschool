@@ -3,6 +3,8 @@ SUITS = %w(hearts diamonds clubs spades)
 TOURNAMENT_MAX = 5
 player_wins = 0
 dealer_wins = 0
+PLAYER_MAX = 21
+DEALER_MAX = 17
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -11,24 +13,26 @@ end
 def initialize_deck
   SUITS.product(VALUES).shuffle
 end
+# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
 def total(gamecards)
   values = gamecards.map { |card| card[1] }
   sum = 0
   values.each do |value|
     if value == "jack" || value == "king" || value == "queen"
-      sum += 10 if sum != 21
+      sum += 10 if sum != PLAYER_MAX
     else
       sum += value.to_i
     end
-    if value == "ace" && sum >= 20
+    if value == "ace" && sum >= (PLAYER_MAX - 1)
       sum += 1
-    elsif value == "ace" && sum < 20
-      sum += 11 if sum != 21
+    elsif value == "ace" && sum < (PLAYER_MAX - 1)
+      sum += 11 if sum != PLAYER_MAX
     end
   end
   sum
 end
+# rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, MetricsPerceivedComplexity
 
 def format_string(array)
   string = ''
@@ -39,7 +43,7 @@ def format_string(array)
 end
 
 def busted?(cards)
-  total(cards) >= 21
+  total(cards) >= PLAYER_MAX
 end
 
 def dealer_result(cards)
@@ -58,8 +62,6 @@ def play_again?
   puts "-------------"
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
-  player_wins = 0
-  dealer_wins = 0
   system "clear"
   answer.downcase.start_with?('y')
 end
@@ -84,10 +86,9 @@ loop do
     dealer_wins = 0
     break unless play_again?
   end
-  system "clear" 
+  system "clear"
   prompt "Welcome to Twenty One!"
   prompt "This tournament is best of five games."
-  
   deck = initialize_deck
   player_cards = []
   dealer_cards = []
@@ -103,11 +104,9 @@ loop do
   prompt "Player's tournament score is #{player_wins}"
   prompt "Dealer's tournament score is #{dealer_wins}"
 
-
   dealer_total = total(dealer_cards)
   player_total = total(player_cards)
 
-# player turn
   loop do
     player_answer = ''
     loop do
@@ -122,25 +121,24 @@ loop do
       player_cards << deck.pop
       prompt "You now have #{format_string(player_cards)}."
     end
-    break if busted?(player_cards) || player_answer == "stay" 
+    break if busted?(player_cards) || player_answer == "stay"
   end
 
   if busted?(player_cards)
     player_result(player_cards)
     dealer_wins += 1
   else
+    player_total = total(player_cards)
     prompt "You stayed at #{player_total}"
   end
   player_total = total(player_cards)
- # puts "------------------"
-  # dealer turn
+
   loop do
     if !busted?(player_cards)
       prompt "Dealer will play now..."
       Kernel.sleep(1)
       dealer_cards << deck.pop
       prompt "Dealer has #{format_string(dealer_cards)}."
-      
       if busted?(dealer_cards)
         player_wins += 1
         dealer_result(dealer_cards)
@@ -149,7 +147,7 @@ loop do
         prompt "Dealer stayed at #{dealer_total}"
       end
 
-      break if busted?(dealer_cards) || dealer_total >= 17 
+      break if busted?(dealer_cards) || dealer_total >= DEALER_MAX
     end
     break if busted?(player_cards)
   end
