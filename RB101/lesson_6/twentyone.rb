@@ -13,7 +13,9 @@ end
 def initialize_deck
   SUITS.product(VALUES).shuffle
 end
-# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+
+# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+# rubocop:disable Metrics/PerceivedComplexity
 
 def total(gamecards)
   values = gamecards.map { |card| card[1] }
@@ -32,7 +34,8 @@ def total(gamecards)
   end
   sum
 end
-# rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, MetricsPerceivedComplexity
+# rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/PerceivedComplexity
 
 def format_string(array)
   string = ''
