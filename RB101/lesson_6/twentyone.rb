@@ -14,28 +14,37 @@ def initialize_deck
   SUITS.product(VALUES).shuffle
 end
 
-# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-# rubocop:disable Metrics/PerceivedComplexity
-
 def total(gamecards)
   values = gamecards.map { |card| card[1] }
   sum = 0
   values.each do |value|
-    if value == "jack" || value == "king" || value == "queen"
-      sum += 10 if sum != PLAYER_MAX
+    if value == "ace"
+      sum += 11
+    elsif value.to_i == 0
+      sum += 10
     else
       sum += value.to_i
     end
-    if value == "ace" && sum >= (PLAYER_MAX - 1)
-      sum += 1
-    elsif value == "ace" && sum < (PLAYER_MAX - 1)
-      sum += 11 if sum != PLAYER_MAX
-    end
+  end
+  values.select { |value| value == "ace" }.count.times do
+    sum -= 10 if sum > PLAYER_MAX
   end
   sum
 end
-# rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
-# rubocop:enable Metrics/PerceivedComplexity
+
+#     if value == "jack" || value == "king" || value == "queen"
+#       sum += 10 if sum != PLAYER_MAX
+#     else
+#       sum += value.to_i
+#     end
+#     if value == "ace" && sum >= (PLAYER_MAX - 1)
+#       sum += 1
+#     elsif value == "ace" && sum < (PLAYER_MAX - 1)
+#       sum += 11 if sum != PLAYER_MAX
+#     end
+#   end
+#   sum
+# end
 
 def format_string(array)
   string = ''
