@@ -90,6 +90,8 @@ end
 def busted_player_move(cards)
   if busted?(cards)
     player_result(cards)
+  else
+    stay_move(cards)
   end
 end
 
@@ -110,7 +112,8 @@ loop do
   puts "---------------------"
   prompt "You have #{player_cards[0][1]} of #{player_cards[0][0]}."
   prompt "You have #{player_cards[1][1]} of #{player_cards[1][0]}."
-  prompt "Dealer has #{dealer_cards[0][1]} of #{dealer_cards[0][0]} and unknown card."
+  prompt "Dealer has #{dealer_cards[0][1]} of #{dealer_cards[0][0]}."
+  prompt "Dealer has an unknown card."
 
   dealer_total = total(dealer_cards)
   player_total = total(player_cards)
@@ -128,11 +131,9 @@ loop do
     break if busted?(player_cards) || player_answer == "stay"
   end
 
-  # if busted?(player_cards)
-  #   player_result(player_cards)
-  #   dealer_wins += 1
- if !busted_player_move(player_cards)
-    dealer_wins+=1
+  if busted?(player_cards)
+    player_result(player_cards)
+    dealer_wins += 1
   else
     stay_move(player_cards)
   end
@@ -144,16 +145,15 @@ loop do
 
       dealer_cards << deck.pop
       prompt "Dealer has #{display_cards(dealer_cards)}."
-      
       if busted?(dealer_cards)
         player_wins += 1
         dealer_result(dealer_cards)
       else
         stay_move(dealer_cards)
       end
-      break if busted?(dealer_cards) 
+      break if busted?(dealer_cards)
     end
-  break if busted?(player_cards)
+    break if busted?(player_cards)
   end
 
   dealer_total = total(dealer_cards)
@@ -167,17 +167,17 @@ loop do
   prompt "Dealer's tournament score is #{dealer_wins}"
   puts "------------------"
   prompt "Press enter to start a new round."
-  answer = gets.chomp
+  gets.chomp
   wait_btwn_rounds
 
   if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
     prompt "#{TOURNAMENT_MAX} wins. Game over."
-    if player_wins > dealer_wins
+    if player_wins == dealer_wins
+      prompt "It's a tie"
+    elsif player_wins > dealer_wins
       prompt "Player won!"
     else
       prompt "Dealer won!"
-    elsif player_wins == dealer_wins
-      prompt "Its a tie!"
     end
     break unless play_again?
     player_wins = 0
