@@ -1,7 +1,7 @@
 require 'pry'
 VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
-TOURNAMENT_MAX = 5
+TOURNAMENT_MAX = 2
 PLAYER_MAX = 21
 DEALER_MAX = 17
 
@@ -37,6 +37,12 @@ def display_cards(hand)
     string << "#{element[1]}, "
   end
   string.slice(0..-3)
+end
+
+def ask_player?
+  puts "---------------------"
+  prompt "Player, hit or stay?"
+  player_answer = gets.chomp
 end
 
 def busted?(cards)
@@ -76,18 +82,21 @@ def wait_btwn_rounds
   Kernel.sleep(1)
 end
 
-def ask_player?
-  puts "---------------------"
-  prompt "Player, hit or stay?"
-  player_answer = gets.chomp
- # player_answer == "hit"  
+def stay_move(cards)
+  total(cards)
+  prompt "Stayed at #{total(cards)}"
+end
+
+def busted_player_move(cards)
+  if busted?(cards)
+    player_result(cards)
+  end
 end
 
 player_wins = 0
 dealer_wins = 0
 
 loop do
-
   prompt "Welcome to Twenty One!"
   prompt "This tournament is best of five games."
   deck = initialize_deck
@@ -114,61 +123,66 @@ loop do
       prompt "Please enter a correct option: hit or stay."
     end
     system "clear"
-    if player_answer == "hit"
-      player_cards << deck.pop
-      prompt "You now have #{display_cards(player_cards)}."
-    end
+    player_cards << deck.pop if player_answer == "hit"
+    prompt "You now have #{display_cards(player_cards)}."
     break if busted?(player_cards) || player_answer == "stay"
   end
 
-  if busted?(player_cards)
-    player_result(player_cards)
-    dealer_wins += 1
+  # if busted?(player_cards)
+  #   player_result(player_cards)
+  #   dealer_wins += 1
+ if !busted_player_move(player_cards)
+    dealer_wins+=1
   else
-    player_total = total(player_cards)
-    prompt "You stayed at #{player_total}"
+    stay_move(player_cards)
   end
 
   loop do
     if !busted?(player_cards)
       prompt "Dealer will play now..."
       Kernel.sleep(1)
+
       dealer_cards << deck.pop
       prompt "Dealer has #{display_cards(dealer_cards)}."
+      
       if busted?(dealer_cards)
         player_wins += 1
         dealer_result(dealer_cards)
       else
-        dealer_total = total(dealer_cards)
-        prompt "Dealer stayed at #{dealer_total}"
+        stay_move(dealer_cards)
       end
       break if busted?(dealer_cards) 
     end
-    break if busted?(player_cards)
+  break if busted?(player_cards)
   end
 
   dealer_total = total(dealer_cards)
   player_total = total(player_cards)
 
+  puts "------------------"
+  prompt "You had #{display_cards(player_cards)} equal to #{player_total}"
+  prompt "Dealer had #{display_cards(dealer_cards)} equal to #{dealer_total}"
   puts "--------------"
   prompt "Player's tournament score is #{player_wins}"
   prompt "Dealer's tournament score is #{dealer_wins}"
   puts "------------------"
-  prompt "You had #{display_cards(player_cards)} equal to #{player_total}"
-  prompt "Dealer had #{display_cards(dealer_cards)} equal to #{dealer_total}"
-
   prompt "Press enter to start a new round."
   answer = gets.chomp
   wait_btwn_rounds
 
-    if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
+  if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
     prompt "#{TOURNAMENT_MAX} wins. Game over."
-    # player_wins = 0
-    # dealer_wins = 0
+    if player_wins > dealer_wins
+      prompt "Player won!"
+    else
+      prompt "Dealer won!"
+    elsif player_wins == dealer_wins
+      prompt "Its a tie!"
+    end
     break unless play_again?
+    player_wins = 0
+    dealer_wins = 0
   end
   system "clear"
-
 end
-
 prompt "Thank you for playing Twenty One! Good bye."
