@@ -1,6 +1,6 @@
 VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
-TOURNAMENT_MAX = 5
+TOURNAMENT_MAX = 2
 PLAYER_MAX = 21
 DEALER_MAX = 17
 
@@ -48,6 +48,10 @@ def busted?(cards)
   total(cards) > PLAYER_MAX
 end
 
+def dealer_reached_max?(cards)
+  total(cards) > DEALER_MAX
+end
+
 def dealer_result(cards)
   if !!busted?(cards)
     prompt "Dealer's a bust. You win."
@@ -91,16 +95,6 @@ def display_dealer
   Kernel.sleep(1)
 end
 
-def scoring
-  player_wins = ''
-  dealer_wins = ''
-  if player_wins > dealer_wins
-    prompt "Player won!"
-  else
-    prompt "Dealer won!"
-  end
-end
-
 player_wins = 0
 dealer_wins = 0
 
@@ -136,19 +130,18 @@ loop do
 
   if busted?(player_cards)
     player_result(player_cards)
-    dealer_wins += 1
   else
     display_stay(player_cards)
   end
+
   
-  until busted?(player_cards) || busted?(dealer_cards)
+  until busted?(dealer_cards) || dealer_reached_max?(dealer_cards) || busted?(player_cards)
     display_dealer
     dealer_cards << deck.pop
     prompt "Dealer has #{display_cards(dealer_cards)}."
     if busted?(dealer_cards)
-      player_wins += 1
       dealer_result(dealer_cards)
-    else
+    elsif !!dealer_reached_max?(dealer_cards)
       display_stay(dealer_cards)
     end
   end
@@ -159,19 +152,31 @@ loop do
   puts "------------------"
   prompt "You had #{display_cards(player_cards)} equal to #{player_total}"
   prompt "Dealer had #{display_cards(dealer_cards)} equal to #{dealer_total}"
-  puts "--------------"
+  puts "------------------"
+ 
+  if busted?(player_cards)
+    prompt "Dealer won!"
+  elsif busted?(dealer_cards)
+    prompt "Player won!"
+  elsif dealer_reached_max?(dealer_cards) && dealer_total > player_total
+    dealer_wins += 1
+    prompt "Dealer won!"
+  elsif dealer_reached_max?(dealer_cards) && player_total > dealer_total
+    player_wins += 1
+    prompt "Player won!"
+  end
+ 
+  puts "------------------"
   prompt "Player's tournament score is #{player_wins}"
   prompt "Dealer's tournament score is #{dealer_wins}"
-  puts "------------------"
-  scoring
   puts "-------------------"
+
   prompt "Press enter to start a new round."
   gets.chomp
   wait_btwn_rounds
 
   if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
     prompt "#{TOURNAMENT_MAX} wins. Game over."
-    scoring
     break unless play_again?
     player_wins = 0
     dealer_wins = 0
