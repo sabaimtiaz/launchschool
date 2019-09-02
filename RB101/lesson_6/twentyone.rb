@@ -105,6 +105,7 @@ player_wins = 0
 dealer_wins = 0
 
 loop do
+  system "clear"
   prompt "Welcome to Twenty One!"
   prompt "This tournament is best of five games."
   deck = initialize_deck
@@ -139,7 +140,7 @@ loop do
   else
     display_stay(player_cards)
   end
-
+  
   until busted?(player_cards) || busted?(dealer_cards)
     display_dealer
     dealer_cards << deck.pop
@@ -162,6 +163,8 @@ loop do
   prompt "Player's tournament score is #{player_wins}"
   prompt "Dealer's tournament score is #{dealer_wins}"
   puts "------------------"
+  scoring
+  puts "-------------------"
   prompt "Press enter to start a new round."
   gets.chomp
   wait_btwn_rounds
