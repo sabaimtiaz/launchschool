@@ -1,7 +1,6 @@
-require 'pry'
 VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
-TOURNAMENT_MAX = 2
+TOURNAMENT_MAX = 5
 PLAYER_MAX = 21
 DEALER_MAX = 17
 
