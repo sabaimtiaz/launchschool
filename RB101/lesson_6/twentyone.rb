@@ -17,7 +17,7 @@ def total(gamecards)
   values = gamecards.map { |card| card[1] }
   sum = 0
   values.each do |value|
-    if value == "ace"
+    if value.to_s == "ace"
       sum += 11
     elsif value.to_i == 0
       sum += 10
@@ -34,15 +34,15 @@ end
 def display_cards(hand)
   string = ''
   hand.each do |element|
-    string << "#{element[1]}, "
+    string << "#{element[1]} of #{element[0]}, "
   end
   string.slice(0..-3)
 end
 
-def ask_player?
+def ask_player
   puts "---------------------"
   prompt "Player, hit or stay?"
-  player_answer = gets.chomp
+  gets.chomp
 end
 
 def busted?(cards)
@@ -66,7 +66,7 @@ def play_again?
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
   system "clear"
-  answer.downcase.start_with?('y')
+  answer.downcase == 'y'
 end
 
 def wait_btwn_rounds
@@ -82,16 +82,23 @@ def wait_btwn_rounds
   Kernel.sleep(1)
 end
 
-def stay_move(cards)
+def display_stay(cards)
   total(cards)
   prompt "Stayed at #{total(cards)}"
 end
 
-def busted_player_move(cards)
-  if busted?(cards)
-    player_result(cards)
+def display_dealer
+  prompt "Dealer will play now..."
+  Kernel.sleep(1)
+end
+
+def scoring
+  player_wins = ''
+  dealer_wins = ''
+  if player_wins > dealer_wins
+    prompt "Player won!"
   else
-    stay_move(cards)
+    prompt "Dealer won!"
   end
 end
 
@@ -110,18 +117,14 @@ loop do
   end
 
   puts "---------------------"
-  prompt "You have #{player_cards[0][1]} of #{player_cards[0][0]}."
-  prompt "You have #{player_cards[1][1]} of #{player_cards[1][0]}."
+  prompt "You have #{display_cards(player_cards)}"
   prompt "Dealer has #{dealer_cards[0][1]} of #{dealer_cards[0][0]}."
   prompt "Dealer has an unknown card."
-
-  dealer_total = total(dealer_cards)
-  player_total = total(player_cards)
 
   loop do
     player_answer = ''
     loop do
-      player_answer = ask_player?
+      player_answer = ask_player
       break if player_answer == "hit" || player_answer == "stay"
       prompt "Please enter a correct option: hit or stay."
     end
@@ -135,25 +138,19 @@ loop do
     player_result(player_cards)
     dealer_wins += 1
   else
-    stay_move(player_cards)
+    display_stay(player_cards)
   end
 
-  loop do
-    if !busted?(player_cards)
-      prompt "Dealer will play now..."
-      Kernel.sleep(1)
-
-      dealer_cards << deck.pop
-      prompt "Dealer has #{display_cards(dealer_cards)}."
-      if busted?(dealer_cards)
-        player_wins += 1
-        dealer_result(dealer_cards)
-      else
-        stay_move(dealer_cards)
-      end
-      break if busted?(dealer_cards)
+  until busted?(player_cards) || busted?(dealer_cards)
+    display_dealer
+    dealer_cards << deck.pop
+    prompt "Dealer has #{display_cards(dealer_cards)}."
+    if busted?(dealer_cards)
+      player_wins += 1
+      dealer_result(dealer_cards)
+    else
+      display_stay(dealer_cards)
     end
-    break if busted?(player_cards)
   end
 
   dealer_total = total(dealer_cards)
@@ -172,13 +169,7 @@ loop do
 
   if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
     prompt "#{TOURNAMENT_MAX} wins. Game over."
-    if player_wins == dealer_wins
-      prompt "It's a tie"
-    elsif player_wins > dealer_wins
-      prompt "Player won!"
-    else
-      prompt "Dealer won!"
-    end
+    scoring
     break unless play_again?
     player_wins = 0
     dealer_wins = 0
