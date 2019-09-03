@@ -98,7 +98,7 @@ end
 player_wins = 0
 dealer_wins = 0
 
-moves = ["h"=>"hit", "hit"=>"hit", "s"=>"stay", "stay"=>"stay"]
+moves = ["h" => "hit", "hit" => "hit", "s" => "stay", "stay" => "stay"]
 
 loop do
   system "clear"
@@ -126,6 +126,7 @@ loop do
       prompt "Please enter a correct option: hit or stay."
     end
     system "clear"
+
     player_cards << deck.pop if player_answer.start_with?('h')
     prompt "You now have #{display_cards(player_cards)}."
     break if busted?(player_cards) || player_answer.start_with?('s')
@@ -146,6 +147,7 @@ loop do
     elsif !!dealer_reached_max?(dealer_cards)
       display_stay(dealer_cards)
     end
+    break if busted?(player_cards)
   end
 
   dealer_total = total(dealer_cards)
@@ -171,7 +173,7 @@ loop do
   elsif dealer_total == player_total
     prompt "It's a tie!"
   end
-  
+
   puts "------------------"
   prompt "Your tournament score is #{player_wins}"
   prompt "Dealer's tournament score is #{dealer_wins}"
