@@ -134,8 +134,7 @@ loop do
     display_stay(player_cards)
   end
 
-  
-  until busted?(dealer_cards) || dealer_reached_max?(dealer_cards) || busted?(player_cards)
+  until busted?(dealer_cards) || dealer_reached_max?(dealer_cards)
     display_dealer
     dealer_cards << deck.pop
     prompt "Dealer has #{display_cards(dealer_cards)}."
@@ -153,19 +152,22 @@ loop do
   prompt "You had #{display_cards(player_cards)} equal to #{player_total}"
   prompt "Dealer had #{display_cards(dealer_cards)} equal to #{dealer_total}"
   puts "------------------"
- 
+
   if busted?(player_cards)
     prompt "Dealer won!"
+    dealer_wins += 1
   elsif busted?(dealer_cards)
     prompt "Player won!"
+    player_wins += 1
   elsif dealer_reached_max?(dealer_cards) && dealer_total > player_total
     dealer_wins += 1
     prompt "Dealer won!"
   elsif dealer_reached_max?(dealer_cards) && player_total > dealer_total
     player_wins += 1
     prompt "Player won!"
+  elsif dealer_total == player_total
+    prompt "It's a tie!"
   end
- 
   puts "------------------"
   prompt "Player's tournament score is #{player_wins}"
   prompt "Dealer's tournament score is #{dealer_wins}"
