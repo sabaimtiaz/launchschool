@@ -98,10 +98,13 @@ end
 player_wins = 0
 dealer_wins = 0
 
+moves = ["h"=>"hit", "hit"=>"hit", "s"=>"stay", "stay"=>"stay"]
+
 loop do
   system "clear"
   prompt "Welcome to Twenty One!"
   prompt "This tournament is best of five games."
+  system "clear"
   deck = initialize_deck
   player_cards = []
   dealer_cards = []
@@ -119,13 +122,13 @@ loop do
     player_answer = ''
     loop do
       player_answer = ask_player
-      break if player_answer == "hit" || player_answer == "stay"
+      break unless moves.include?(player_answer)
       prompt "Please enter a correct option: hit or stay."
     end
     system "clear"
-    player_cards << deck.pop if player_answer == "hit"
+    player_cards << deck.pop if player_answer.start_with?('h')
     prompt "You now have #{display_cards(player_cards)}."
-    break if busted?(player_cards) || player_answer == "stay"
+    break if busted?(player_cards) || player_answer.start_with?('s')
   end
 
   if busted?(player_cards)
@@ -157,19 +160,20 @@ loop do
     prompt "Dealer won!"
     dealer_wins += 1
   elsif busted?(dealer_cards)
-    prompt "Player won!"
+    prompt "You won!"
     player_wins += 1
   elsif dealer_reached_max?(dealer_cards) && dealer_total > player_total
     dealer_wins += 1
     prompt "Dealer won!"
   elsif dealer_reached_max?(dealer_cards) && player_total > dealer_total
     player_wins += 1
-    prompt "Player won!"
+    prompt "You won!"
   elsif dealer_total == player_total
     prompt "It's a tie!"
   end
+  
   puts "------------------"
-  prompt "Player's tournament score is #{player_wins}"
+  prompt "Your tournament score is #{player_wins}"
   prompt "Dealer's tournament score is #{dealer_wins}"
   puts "-------------------"
 
