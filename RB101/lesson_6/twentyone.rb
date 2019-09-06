@@ -2,7 +2,7 @@ VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
 MOVES = [["hit", "h"], ["s", "stay"]]
 PLAY_AGAIN_MOVES = ["yes", "no"]
-TOURNAMENT_MAX = 1
+TOURNAMENT_MAX = 2
 PLAYER_MAX = 21
 DEALER_MAX = 17
 
@@ -84,7 +84,7 @@ end
 
 def play_again
   puts "-------------"
-  prompt "Do you want to play again? (yes or no)"
+  prompt "Do you want to play another round? (yes or no)"
   gets.chomp
 end
 
@@ -105,6 +105,7 @@ player_wins = 0
 dealer_wins = 0
 
 loop do
+  system "clear"
   prompt "Welcome to Twenty One!"
   prompt "This tournament is best of five games."
   deck = initialize_deck
@@ -183,23 +184,23 @@ loop do
   prompt "Dealer's tournament score is #{dealer_wins}"
   puts "-------------------"
 
+  prompt "Press enter to start a new round."
+  gets.chomp
+  system "clear"
+  wait_btwn_rounds
+
   if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
     prompt "#{TOURNAMENT_MAX} wins. Game over."
-  else
-    prompt "Press enter to start a new round."
-    gets.chomp
-    wait_btwn_rounds
-  end
-
-  gameplay_answer = ''
-  loop do
-    gameplay_answer = play_again
-    break if gameplay_answer == "yes" || gameplay_answer == "no"
+    gameplay_answer = ''
+    loop do
+      gameplay_answer = play_again
+      break if gameplay_answer == "yes" || gameplay_answer == "no"
+    end
+    player_wins = 0
+    dealer_wins = 0
   end
 
   if gameplay_answer == "no"
-    player_wins = 0
-    dealer_wins = 0
     system "clear"
     break
   end
