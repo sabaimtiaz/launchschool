@@ -1,7 +1,8 @@
 VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
-MOVES = ["h" => "hit", "hit" => "hit", "s" => "stay", "stay" => "stay"]
-TOURNAMENT_MAX = 5
+MOVES = [["hit", "h"], ["s", "stay"]]
+PLAY_AGAIN_MOVES = ["yes", "no"]
+TOURNAMENT_MAX = 1
 PLAYER_MAX = 21
 DEALER_MAX = 17
 
@@ -45,6 +46,11 @@ def ask_player
   gets.chomp
 end
 
+def error_msg(answer)
+  if !MOVES.include?(answer)
+    prompt "Enter (h)it or (s)tay"
+  end
+end
 
 def display_stay(cards)
   total(cards)
@@ -76,12 +82,10 @@ def player_result(cards)
   end
 end
 
-def play_again?
+def play_again
   puts "-------------"
-  prompt "Do you want to play again? (y or n)"
-  answer = gets.chomp
-  system "clear"
-  answer.downcase == 'y'
+  prompt "Do you want to play again? (yes or no)"
+  gets.chomp
 end
 
 def wait_btwn_rounds
@@ -125,9 +129,9 @@ loop do
     end
     system "clear"
 
-    player_cards << deck.pop if player_answer.start_with?('h')
+    player_cards << deck.pop if MOVES[0].include?(player_answer)
     prompt "You now have #{display_cards(player_cards)}."
-    break if busted?(player_cards) || player_answer.start_with?('s')
+    break if busted?(player_cards) || MOVES[1].include?(player_answer)
   end
 
   if busted?(player_cards)
@@ -179,17 +183,25 @@ loop do
   prompt "Dealer's tournament score is #{dealer_wins}"
   puts "-------------------"
 
-  prompt "Press enter to start a new round."
-  gets.chomp
-  wait_btwn_rounds
-
   if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
     prompt "#{TOURNAMENT_MAX} wins. Game over."
-    break unless play_again?
+  else
+    prompt "Press enter to start a new round."
+    gets.chomp
+    wait_btwn_rounds
+  end
+
+  gameplay_answer = ''
+  loop do
+    gameplay_answer = play_again
+    break if gameplay_answer == "yes" || gameplay_answer == "no"
+  end
+
+  if gameplay_answer == "no"
     player_wins = 0
     dealer_wins = 0
+    system "clear"
+    break
   end
-  system "clear"
 end
 prompt "Thank you for playing Twenty One! Good bye."
- 
