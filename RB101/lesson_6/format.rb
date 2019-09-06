@@ -6,14 +6,10 @@ def format(array)
    # string.delete_suffix(", ")
   end
   string.slice(0..-3)
-#  p string.delete_suffix(",")
+  string.gsub(',', " \n").slice(0..-3)
+ # string.each_line() {|s| p s}
 
 end
-arr = [[1, "clubs"],[2, "diamonds"],[3, "hearts"]]
-p format(arr)
+arr = [[1, "clubs"],[2, "diamonds"],[3, "hearts"], [4, "clubs"], [5, "gifts"]]
+puts format(arr)
 
-#   hand.each do |element|
-#     string << "#{element[1]}, "
-#   end
-#   string.slice(0..-3)
-# end

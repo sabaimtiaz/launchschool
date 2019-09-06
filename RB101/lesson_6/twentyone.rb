@@ -1,6 +1,7 @@
 VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
-TOURNAMENT_MAX = 2
+MOVES = ["h" => "hit", "hit" => "hit", "s" => "stay", "stay" => "stay"]
+TOURNAMENT_MAX = 5
 PLAYER_MAX = 21
 DEALER_MAX = 17
 
@@ -44,6 +45,17 @@ def ask_player
   gets.chomp
 end
 
+
+def display_stay(cards)
+  total(cards)
+  prompt "Stayed at #{total(cards)}"
+end
+
+def display_dealer
+  prompt "Dealer will play now..."
+  Kernel.sleep(1)
+end
+
 def busted?(cards)
   total(cards) > PLAYER_MAX
 end
@@ -85,26 +97,12 @@ def wait_btwn_rounds
   Kernel.sleep(1)
 end
 
-def display_stay(cards)
-  total(cards)
-  prompt "Stayed at #{total(cards)}"
-end
-
-def display_dealer
-  prompt "Dealer will play now..."
-  Kernel.sleep(1)
-end
-
 player_wins = 0
 dealer_wins = 0
 
-moves = ["h" => "hit", "hit" => "hit", "s" => "stay", "stay" => "stay"]
-
 loop do
-  system "clear"
   prompt "Welcome to Twenty One!"
   prompt "This tournament is best of five games."
-  system "clear"
   deck = initialize_deck
   player_cards = []
   dealer_cards = []
@@ -122,7 +120,7 @@ loop do
     player_answer = ''
     loop do
       player_answer = ask_player
-      break unless moves.include?(player_answer)
+      break unless MOVES.include?(player_answer)
       prompt "Please enter a correct option: hit or stay."
     end
     system "clear"
@@ -139,6 +137,7 @@ loop do
   end
 
   until busted?(dealer_cards) || dealer_reached_max?(dealer_cards)
+    break if busted?(player_cards)
     display_dealer
     dealer_cards << deck.pop
     prompt "Dealer has #{display_cards(dealer_cards)}."
@@ -147,15 +146,16 @@ loop do
     elsif !!dealer_reached_max?(dealer_cards)
       display_stay(dealer_cards)
     end
-    break if busted?(player_cards)
   end
 
   dealer_total = total(dealer_cards)
   player_total = total(player_cards)
 
   puts "------------------"
-  prompt "You had #{display_cards(player_cards)} equal to #{player_total}"
-  prompt "Dealer had #{display_cards(dealer_cards)} equal to #{dealer_total}"
+  prompt "You had #{display_cards(player_cards)}"
+  prompt "Your cards are equal to #{player_total}"
+  prompt "Dealer had #{display_cards(dealer_cards)}"
+  prompt "Dealer's cards are equal to #{dealer_total}"
   puts "------------------"
 
   if busted?(player_cards)
@@ -192,3 +192,4 @@ loop do
   system "clear"
 end
 prompt "Thank you for playing Twenty One! Good bye."
+ 
