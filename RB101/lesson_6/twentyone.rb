@@ -180,12 +180,12 @@ def display_tie(p_cards, d_cards)
   prompt "It's a tie" if hand_total(p_cards) == hand_total(d_cards)
 end
 
-def tournament_max_reached?(player_wins, dealer_wins)
-  player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
+def tournament_max_reached?(player_score, dealer_score)
+  player_score == TOURNAMENT_MAX || dealer_score == TOURNAMENT_MAX
 end
 
 def play_again
-  puts "-------------"
+  puts "------------------"
   prompt "Do you want to play another round? (yes or no)"
   gets.chomp
 end
@@ -214,8 +214,8 @@ def goodbye
   prompt "Thank you for playing Twenty One! Good bye."
 end
 
-player_wins = 0
-dealer_wins = 0
+player_score = 0
+dealer_score = 0
 
 loop do
   welcome
@@ -249,20 +249,20 @@ loop do
 
   display_player_result(player_cards, dealer_cards)
   display_dealer_result(player_cards, dealer_cards)
-  player_wins = update_player_score(player_cards, dealer_cards, player_wins)
-  dealer_wins = update_dealer_score(player_cards, dealer_cards, dealer_wins)
+  player_score = update_player_score(player_cards, dealer_cards, player_score)
+  dealer_score = update_dealer_score(player_cards, dealer_cards, dealer_score)
 
-  display_score(player_wins, dealer_wins)
+  display_score(player_score, dealer_score)
 
-  if tournament_max_reached?(player_wins, dealer_wins)
+  if tournament_max_reached?(player_score, dealer_score)
     prompt "#{TOURNAMENT_MAX} wins. Game over."
     gameplay_answer = ''
     loop do
       gameplay_answer = play_again
       break if gameplay_answer == "yes" || gameplay_answer == "no"
     end
-    player_wins = 0
-    dealer_wins = 0
+    player_score = 0
+    dealer_score = 0
     if gameplay_answer == "no"
       system "clear"
       break
