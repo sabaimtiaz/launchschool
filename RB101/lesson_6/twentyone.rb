@@ -1,3 +1,4 @@
+require 'pry'
 VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
 MOVES = [["hit", "h"], ["s", "stay"]]
@@ -10,11 +11,17 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+def welcome
+  system "clear"
+  prompt "Welcome to Twenty One!"
+  prompt "This tournament is the best of five games."
+end
+
 def initialize_deck
   SUITS.product(VALUES).shuffle
 end
 
-def total(gamecards)
+def hand_total(gamecards)
   values = gamecards.map { |card| card[1] }
   sum = 0
   values.each do |value|
@@ -30,6 +37,31 @@ def total(gamecards)
     sum -= 10 if sum > PLAYER_MAX
   end
   sum
+end
+
+def generate_hand(hand)
+  deck = initialize_deck
+  hand = []
+  hand << deck.pop
+  hand << deck.pop
+end
+
+def display_opening(player_cards, dealer_cards)
+  puts "---------------------"
+  prompt "You have #{display_cards(player_cards)}"
+  prompt "Dealer has #{dealer_cards[0][1]} of #{dealer_cards[0][0]}."
+  prompt "Dealer has an unknown card."
+end
+
+def display_hand(player_cards, dealer_cards)
+  dealer_hand_total = hand_total(dealer_cards)
+  player_hand_total = hand_total(player_cards)
+  puts "------------------"
+  prompt "You had #{display_cards(player_cards)}"
+  prompt "Your cards are equal to #{player_hand_total}"
+  prompt "Dealer had #{display_cards(dealer_cards)}"
+  prompt "Dealer's cards are equal to #{dealer_hand_total}"
+  puts "------------------"
 end
 
 def display_cards(hand)
@@ -48,13 +80,13 @@ end
 
 def error_msg(answer)
   if !MOVES.include?(answer)
-    prompt "Enter (h)it or (s)tay"
+    prompt "Wrong answer. Enter (h)it or (s)tay"
   end
 end
 
 def display_stay(cards)
-  total(cards)
-  prompt "Stayed at #{total(cards)}"
+  hand_total(cards)
+  prompt "Stayed at #{hand_total(cards)}"
 end
 
 def display_dealer
@@ -63,23 +95,97 @@ def display_dealer
 end
 
 def busted?(cards)
-  total(cards) > PLAYER_MAX
+  hand_total(cards) > PLAYER_MAX
 end
 
-def dealer_reached_max?(cards)
-  total(cards) > DEALER_MAX
+def dealer_reach_max?(cards)
+  hand_total(cards) > DEALER_MAX
 end
 
-def dealer_result(cards)
-  if !!busted?(cards)
-    prompt "Dealer's a bust. You win."
+def player_turn(player_answer, player_cards)
+  deck = initialize_deck
+  if MOVES[0].include?(player_answer)
+    player_cards << deck.pop
+    system "clear"
+    prompt "You now have #{display_cards(player_cards)}."
+  elsif !MOVES.flatten.include?(player_answer)
+    error_msg(player_answer)
   end
 end
 
-def player_result(cards)
-  if !!busted?(cards)
+def player_busts_or_stays(player_cards)
+  if busted?(player_cards)
     prompt "You're a bust. Dealer wins."
+  else
+    system "clear"
+    display_stay(player_cards)
   end
+end
+
+def dealer_turn(dealer_cards)
+  deck = initialize_deck
+  display_dealer
+  dealer_cards << deck.pop
+  prompt "Dealer has #{display_cards(dealer_cards)}."
+end
+
+def dealer_busts_or_stays(dealer_cards)
+  if busted?(dealer_cards)
+    prompt "Dealer's a bust. Player wins."
+  elsif !!dealer_reach_max?(dealer_cards)
+    display_stay(dealer_cards)
+  end
+end
+
+def update_dealer_score(p_cards, d_cards, d_score)
+  if busted?(p_cards)
+    d_score += 1
+  elsif dealer_reach_max?(d_cards) && (hand_total(d_cards) > hand_total(p_cards))
+    d_score += 1
+  end
+  d_score
+end
+
+def update_player_score(p_cards, d_cards, p_score)
+  if busted?(d_cards)
+    p_score += 1
+  elsif dealer_reach_max?(d_cards) && (hand_total(p_cards) > hand_total(d_cards))
+    p_score += 1
+  end
+  p_score
+end
+
+def display_score(player, dealer)
+  puts "------------------"
+  prompt "Your tournament score is #{player}"
+  prompt "Dealer's tournament score is #{dealer}"
+  puts "-------------------"
+end
+
+def player_win?(p_cards, d_cards)
+   busted?(d_cards) || dealer_reach_max?(d_cards) && (hand_total(p_cards) > hand_total(d_cards))
+end
+
+def dealer_win?(p_cards, d_cards)
+  busted?(p_cards) || dealer_reach_max?(d_cards) && (hand_total(d_cards) > hand_total(p_cards))
+end
+
+def display_player_result(p_cards, d_cards)
+  if player_win?(p_cards, d_cards)
+    prompt "You won"
+  end
+end
+
+def display_dealer_result(p_cards, d_cards)
+  prompt "Dealer won" if dealer_win?(p_cards, d_cards)
+end
+    
+def display_tie(p_cards, d_cards) 
+  prompt "It's a tie" if hand_total(p_cards) == hand_total(d_cards)
+end
+
+def tournament_max_reached?(player_wins, dealer_wins)
+  player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
 end
 
 def play_again
@@ -93,33 +199,34 @@ def wait_btwn_rounds
   Kernel.sleep(1)
   prompt "Starting new game in 4..."
   Kernel.sleep(1)
-  prompt "Starting new game in 3..."
-  Kernel.sleep(1)
-  prompt "Starting new game in 2..."
-  Kernel.sleep(1)
-  prompt "Starting new game in 1..."
-  Kernel.sleep(1)
+#   prompt "Starting new game in 3..."
+#   Kernel.sleep(1)
+#   prompt "Starting new game in 2..."
+#   Kernel.sleep(1)
+#   prompt "Starting new game in 1..."
+#   Kernel.sleep(1)
+end
+
+def start_new_round
+  prompt "Press enter to start a new round."
+  gets.chomp
+  system "clear"
+  wait_btwn_rounds
+end
+
+def goodbye
+  prompt "Thank you for playing Twenty One! Good bye."
 end
 
 player_wins = 0
 dealer_wins = 0
 
 loop do
-  system "clear"
-  prompt "Welcome to Twenty One!"
-  prompt "This tournament is best of five games."
-  deck = initialize_deck
-  player_cards = []
-  dealer_cards = []
-  2.times do
-    player_cards << deck.pop
-    dealer_cards << deck.pop
-  end
+  welcome
 
-  puts "---------------------"
-  prompt "You have #{display_cards(player_cards)}"
-  prompt "Dealer has #{dealer_cards[0][1]} of #{dealer_cards[0][0]}."
-  prompt "Dealer has an unknown card."
+  player_cards = generate_hand(player_cards)
+  dealer_cards = generate_hand(dealer_cards)
+  display_opening(player_cards, dealer_cards)
 
   loop do
     player_answer = ''
@@ -128,68 +235,30 @@ loop do
       break unless MOVES.include?(player_answer)
       prompt "Please enter a correct option: hit or stay."
     end
-    system "clear"
 
-    player_cards << deck.pop if MOVES[0].include?(player_answer)
-    prompt "You now have #{display_cards(player_cards)}."
+    player_turn(player_answer, player_cards)
     break if busted?(player_cards) || MOVES[1].include?(player_answer)
   end
 
-  if busted?(player_cards)
-    player_result(player_cards)
-  else
-    display_stay(player_cards)
-  end
+  player_busts_or_stays(player_cards)
 
-  until busted?(dealer_cards) || dealer_reached_max?(dealer_cards)
+  until busted?(dealer_cards) || dealer_reach_max?(dealer_cards)
     break if busted?(player_cards)
-    display_dealer
-    dealer_cards << deck.pop
-    prompt "Dealer has #{display_cards(dealer_cards)}."
-    if busted?(dealer_cards)
-      dealer_result(dealer_cards)
-    elsif !!dealer_reached_max?(dealer_cards)
-      display_stay(dealer_cards)
-    end
+    dealer_turn(dealer_cards)
+    dealer_busts_or_stays(dealer_cards)
   end
 
-  dealer_total = total(dealer_cards)
-  player_total = total(player_cards)
+  display_hand(player_cards, dealer_cards)
+  display_tie(player_cards, dealer_cards)
 
-  puts "------------------"
-  prompt "You had #{display_cards(player_cards)}"
-  prompt "Your cards are equal to #{player_total}"
-  prompt "Dealer had #{display_cards(dealer_cards)}"
-  prompt "Dealer's cards are equal to #{dealer_total}"
-  puts "------------------"
+  display_player_result(player_cards, dealer_cards)
+  display_dealer_result(player_cards, dealer_cards)
+  player_wins = update_player_score(player_cards, dealer_cards, player_wins)
+  dealer_wins = update_dealer_score(player_cards, dealer_cards, dealer_wins)
 
-  if busted?(player_cards)
-    prompt "Dealer won!"
-    dealer_wins += 1
-  elsif busted?(dealer_cards)
-    prompt "You won!"
-    player_wins += 1
-  elsif dealer_reached_max?(dealer_cards) && dealer_total > player_total
-    dealer_wins += 1
-    prompt "Dealer won!"
-  elsif dealer_reached_max?(dealer_cards) && player_total > dealer_total
-    player_wins += 1
-    prompt "You won!"
-  elsif dealer_total == player_total
-    prompt "It's a tie!"
-  end
+  display_score(player_wins, dealer_wins)
 
-  puts "------------------"
-  prompt "Your tournament score is #{player_wins}"
-  prompt "Dealer's tournament score is #{dealer_wins}"
-  puts "-------------------"
-
-  prompt "Press enter to start a new round."
-  gets.chomp
-  system "clear"
-  wait_btwn_rounds
-
-  if player_wins == TOURNAMENT_MAX || dealer_wins == TOURNAMENT_MAX
+  if tournament_max_reached?(player_wins, dealer_wins)
     prompt "#{TOURNAMENT_MAX} wins. Game over."
     gameplay_answer = ''
     loop do
@@ -198,11 +267,12 @@ loop do
     end
     player_wins = 0
     dealer_wins = 0
+  
+    if gameplay_answer == "no"
+      system "clear"
+      break
+    end
   end
-
-  if gameplay_answer == "no"
-    system "clear"
-    break
-  end
+  start_new_round
 end
-prompt "Thank you for playing Twenty One! Good bye."
+goodbye
