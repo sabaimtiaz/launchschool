@@ -3,7 +3,7 @@ VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "king", "queen", "ace"]
 SUITS = %w(hearts diamonds clubs spades)
 MOVES = [["hit", "h"], ["s", "stay"]]
 PLAY_AGAIN_MOVES = ["yes", "no"]
-TOURNAMENT_MAX = 2
+TOURNAMENT_MAX = 5
 PLAYER_MAX = 21
 DEALER_MAX = 17
 
@@ -138,20 +138,12 @@ def dealer_busts_or_stays(dealer_cards)
 end
 
 def update_dealer_score(p_cards, d_cards, d_score)
-  if busted?(p_cards)
-    d_score += 1
-  elsif dealer_reach_max?(d_cards) && (hand_total(d_cards) > hand_total(p_cards))
-    d_score += 1
-  end
+  d_score += 1 if dealer_win?(p_cards, d_cards)
   d_score
 end
 
 def update_player_score(p_cards, d_cards, p_score)
-  if busted?(d_cards)
-    p_score += 1
-  elsif dealer_reach_max?(d_cards) && (hand_total(p_cards) > hand_total(d_cards))
-    p_score += 1
-  end
+  p_score += 1 if player_win?(p_cards, d_cards)
   p_score
 end
 
@@ -163,11 +155,15 @@ def display_score(player, dealer)
 end
 
 def player_win?(p_cards, d_cards)
-   busted?(d_cards) || dealer_reach_max?(d_cards) && (hand_total(p_cards) > hand_total(d_cards))
+  busted?(d_cards) ||
+    !busted?(p_cards) && (dealer_reach_max?(d_cards) &&
+  (hand_total(p_cards) > hand_total(d_cards)))
 end
 
 def dealer_win?(p_cards, d_cards)
-  busted?(p_cards) || dealer_reach_max?(d_cards) && (hand_total(d_cards) > hand_total(p_cards))
+  busted?(p_cards) ||
+    !busted?(d_cards) && (dealer_reach_max?(d_cards) &&
+  (hand_total(d_cards) > hand_total(p_cards)))
 end
 
 def display_player_result(p_cards, d_cards)
@@ -179,8 +175,8 @@ end
 def display_dealer_result(p_cards, d_cards)
   prompt "Dealer won" if dealer_win?(p_cards, d_cards)
 end
-    
-def display_tie(p_cards, d_cards) 
+
+def display_tie(p_cards, d_cards)
   prompt "It's a tie" if hand_total(p_cards) == hand_total(d_cards)
 end
 
@@ -199,12 +195,12 @@ def wait_btwn_rounds
   Kernel.sleep(1)
   prompt "Starting new game in 4..."
   Kernel.sleep(1)
-#   prompt "Starting new game in 3..."
-#   Kernel.sleep(1)
-#   prompt "Starting new game in 2..."
-#   Kernel.sleep(1)
-#   prompt "Starting new game in 1..."
-#   Kernel.sleep(1)
+  prompt "Starting new game in 3..."
+  Kernel.sleep(1)
+  prompt "Starting new game in 2..."
+  Kernel.sleep(1)
+  prompt "Starting new game in 1..."
+  Kernel.sleep(1)
 end
 
 def start_new_round
@@ -267,12 +263,12 @@ loop do
     end
     player_wins = 0
     dealer_wins = 0
-  
     if gameplay_answer == "no"
       system "clear"
       break
     end
   end
   start_new_round
+  system "clear"
 end
 goodbye
