@@ -167,17 +167,15 @@ def dealer_win?(p_cards, d_cards)
 end
 
 def display_player_result(p_cards, d_cards)
-  if player_win?(p_cards, d_cards)
-    prompt "You won"
-  end
+  prompt "You won!" if player_win?(p_cards, d_cards)
 end
 
 def display_dealer_result(p_cards, d_cards)
-  prompt "Dealer won" if dealer_win?(p_cards, d_cards)
+  prompt "Dealer won!" if dealer_win?(p_cards, d_cards)
 end
 
 def display_tie(p_cards, d_cards)
-  prompt "It's a tie" if hand_total(p_cards) == hand_total(d_cards)
+  prompt "It's a tie!" if hand_total(p_cards) == hand_total(d_cards)
 end
 
 def tournament_max_reached?(player_score, dealer_score)
@@ -211,7 +209,8 @@ def start_new_round
 end
 
 def goodbye
-  prompt "Thank you for playing Twenty One! Good bye."
+  prompt "Thank you for playing Twenty One!"
+  prompt "Good bye."
 end
 
 player_score = 0
@@ -245,6 +244,7 @@ loop do
   end
 
   display_hand(player_cards, dealer_cards)
+  prompt "Here's the result:"
   display_tie(player_cards, dealer_cards)
 
   display_player_result(player_cards, dealer_cards)
