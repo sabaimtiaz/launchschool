@@ -75,11 +75,15 @@ end
 def ask_player
   puts "---------------------"
   prompt "Player, hit or stay?"
-  gets.chomp
+  gets.chomp.to_s
+end
+
+def validate_player_answer?(player_answer)
+   MOVES.flatten.include?(player_answer)
 end
 
 def error_msg(answer)
-  if !MOVES.include?(answer)
+  if !validate_player_answer?(answer)
     prompt "Wrong answer. Enter (h)it or (s)tay"
   end
 end
@@ -104,7 +108,7 @@ end
 
 def player_turn(player_answer, player_cards)
   deck = initialize_deck
-  if MOVES[0].include?(player_answer)
+  if MOVES[0].flatten.include?(player_answer)
     player_cards << deck.pop
     system "clear"
     prompt "You now have #{display_cards(player_cards)}."
@@ -132,19 +136,21 @@ end
 def dealer_busts_or_stays(dealer_cards)
   if busted?(dealer_cards)
     prompt "Dealer's a bust. Player wins."
-  elsif !!dealer_reach_max?(dealer_cards)
+  elsif dealer_reach_max?(dealer_cards)
     display_stay(dealer_cards)
   end
 end
 
-def update_dealer_score(p_cards, d_cards, d_score)
-  d_score += 1 if dealer_win?(p_cards, d_cards)
-  d_score
+def win?(player, opponent)
+  busted?(opponent) ||
+    !busted?(player) && (hand_total(player) > hand_total(opponent))
 end
 
-def update_player_score(p_cards, d_cards, p_score)
-  p_score += 1 if player_win?(p_cards, d_cards)
-  p_score
+def update_score(player, opponent, score)
+  if win?(player, opponent)
+    score += 1
+  end
+  score
 end
 
 def display_score(player, dealer)
@@ -154,33 +160,50 @@ def display_score(player, dealer)
   puts "-------------------"
 end
 
-def player_win?(p_cards, d_cards)
-  busted?(d_cards) ||
-    !busted?(p_cards) && (dealer_reach_max?(d_cards) &&
-  (hand_total(p_cards) > hand_total(d_cards)))
-end
-
-def dealer_win?(p_cards, d_cards)
-  busted?(p_cards) ||
-    !busted?(d_cards) && (dealer_reach_max?(d_cards) &&
-  (hand_total(d_cards) > hand_total(p_cards)))
-end
-
-def display_player_result(p_cards, d_cards)
-  prompt "You won!" if player_win?(p_cards, d_cards)
-end
-
-def display_dealer_result(p_cards, d_cards)
-  prompt "Dealer won!" if dealer_win?(p_cards, d_cards)
+def display_winner(p_cards, d_cards)
+  if win?(p_cards, d_cards)
+    prompt "You won!"
+  elsif win?(d_cards, p_cards) && !display_tie(p_cards, d_cards)
+    prompt "Dealer won!"
+  end
 end
 
 def display_tie(p_cards, d_cards)
   prompt "It's a tie!" if hand_total(p_cards) == hand_total(d_cards)
 end
 
+def display_result(p_cards, d_cards)
+  prompt "Here's the result:"
+  display_tie(p_cards, d_cards)
+  display_winner(p_cards, d_cards)
+end
+
 def tournament_max_reached?(player_score, dealer_score)
   player_score == TOURNAMENT_MAX || dealer_score == TOURNAMENT_MAX
 end
+
+
+def display_game_over(player_score, dealer_score)
+  if tournament_max_reached?(player_score, dealer_score)
+    prompt "#{TOURNAMENT_MAX} wins. Game over."
+  end
+end
+
+
+  #   gameplay_answer = ''
+  #   loop do
+  #     gameplay_answer = play_again
+  #     break if gameplay_answer == "yes" || gameplay_answer == "no"
+  #   end
+  #   player_score = 0
+  #   dealer_score = 0
+  #   if gameplay_answer == "no"
+  #     system "clear"
+  #     break
+  #   end
+  # end
+  # start_new_round
+  # system "clear"
 
 def play_again
   puts "------------------"
@@ -191,14 +214,14 @@ end
 def wait_btwn_rounds
   prompt "Starting new game in 5..."
   Kernel.sleep(1)
-  prompt "Starting new game in 4..."
-  Kernel.sleep(1)
-  prompt "Starting new game in 3..."
-  Kernel.sleep(1)
-  prompt "Starting new game in 2..."
-  Kernel.sleep(1)
-  prompt "Starting new game in 1..."
-  Kernel.sleep(1)
+  # prompt "Starting new game in 4..."
+  # Kernel.sleep(1)
+  # prompt "Starting new game in 3..."
+  # Kernel.sleep(1)
+  # prompt "Starting new game in 2..."
+  # Kernel.sleep(1)
+  # prompt "Starting new game in 1..."
+  # Kernel.sleep(1)
 end
 
 def start_new_round
@@ -215,26 +238,16 @@ end
 
 player_score = 0
 dealer_score = 0
-
 loop do
   welcome
-
   player_cards = generate_hand(player_cards)
   dealer_cards = generate_hand(dealer_cards)
   display_opening(player_cards, dealer_cards)
-
   loop do
-    player_answer = ''
-    loop do
-      player_answer = ask_player
-      break unless MOVES.include?(player_answer)
-      prompt "Please enter a correct option: hit or stay."
-    end
-
+    player_answer = ask_player
     player_turn(player_answer, player_cards)
     break if busted?(player_cards) || MOVES[1].include?(player_answer)
   end
-
   player_busts_or_stays(player_cards)
 
   until busted?(dealer_cards) || dealer_reach_max?(dealer_cards)
@@ -244,13 +257,12 @@ loop do
   end
 
   display_hand(player_cards, dealer_cards)
-  prompt "Here's the result:"
-  display_tie(player_cards, dealer_cards)
+  display_result(player_cards, dealer_cards)
 
-  display_player_result(player_cards, dealer_cards)
-  display_dealer_result(player_cards, dealer_cards)
-  player_score = update_player_score(player_cards, dealer_cards, player_score)
-  dealer_score = update_dealer_score(player_cards, dealer_cards, dealer_score)
+  win?(player_cards, dealer_cards) 
+  win?(dealer_cards, player_cards)
+  player_score = update_score(player_cards, dealer_cards, player_score)
+  dealer_score = update_score(dealer_cards, player_cards, dealer_score)
 
   display_score(player_score, dealer_score)
 
@@ -272,3 +284,4 @@ loop do
   system "clear"
 end
 goodbye
+
