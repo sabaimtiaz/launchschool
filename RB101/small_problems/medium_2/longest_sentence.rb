@@ -51,8 +51,8 @@ def print_largest_sentence(text)
     result << words
   end
   largest_sentence = result.max { |a, b| a.length <=> b.length }
-  # puts "#{largest_sentence}"
-  # puts "#{largest_sentence.split.size}"
+  puts "#{largest_sentence}"
+  puts "#{largest_sentence.split.size}"
 end
 print_largest_sentence(text)
 
@@ -67,7 +67,7 @@ def print_largest_sentence(text)
     result << words
   end
   longest_word = result.max { |a, b| a.length <=> b.length }
-  # p longest_word
+  p longest_word
 end
 print_largest_sentence(text)
 
