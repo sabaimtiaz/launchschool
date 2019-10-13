@@ -6,7 +6,6 @@
 # angles be greater than zero
 # return symbol
 
-
 def triangle(angle1, angle2, angle3)
   angles = [angle1, angle2, angle3]
   degree = 90
