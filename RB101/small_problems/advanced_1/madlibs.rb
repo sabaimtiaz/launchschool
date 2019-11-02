@@ -41,4 +41,3 @@ p replace_text(text)
 #   result.strip
 # end
 # madlibs(text)
-

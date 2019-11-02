@@ -16,7 +16,7 @@ def diamond(n)
     break if n < 1
   end
 end
-# diamond(3)
+p diamond(3)
 
 # LS solution
 def print_row(grid_size, distance_from_center)
