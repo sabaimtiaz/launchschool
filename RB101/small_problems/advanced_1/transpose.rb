@@ -10,8 +10,10 @@ def transpose(matrix)
   end
   new_matrix
 end
-matrix = [[1, 5, 8], [4, 7, 2], [3, 9, 6]]
-p transpose(matrix)
+matrix = [[1, 5, 8],
+         [4, 7, 2], 
+         [3, 9, 6]]
+transpose(matrix)
 
 # LS solution
 def transpose(matrix)
@@ -23,6 +25,23 @@ def transpose(matrix)
   result
 end
 matrix = [[1, 5, 8], [4, 7, 2], [3, 9, 6]]
-p transpose(matrix)
+transpose(matrix)
 
 # advanced
+def transpose(matrix)
+  size = matrix.size
+  size.times do |row|
+    size.times do |col|
+      matrix[row] << matrix[col].shift    
+    end
+  end
+  matrix
+end
+matrix = [[2, 4, 5],
+         [3, 2, 1],
+         [1, 8, 9]]
+transpose(matrix)
+
+#  array[i] = subarr[0]
+# end
+# p array
