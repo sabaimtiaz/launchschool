@@ -5,7 +5,7 @@ class Vehicle
 end
 
 class Truck < Vehicle
-  def start_engine(speed)
+  def start_engine(speed) # overrides the superClass method
   	super() + " Drive #{speed}, please!" # call super with empty parantheses since start_engine in Vehicle doesn't accept arguments
   end
 end
