@@ -1,27 +1,48 @@
 require 'pry'
 
+
 class Player
   attr_accessor :marker
 
   def initialize #(marker)
     @marker = marker
+    @@MARKERS = ["X", "O"]
   end
 end
 
 class Human < Player
+
   attr_accessor :name, :score
   def initialize
+    super
     @name = name
     @score = 0
   end
+
+   def choose_marker
+    marker_choice = ''
+    loop do
+      marker_choice = gets.chomp.to_s.upcase
+      break if @@MARKERS.include?(marker_choice)
+      puts "Sorry, that's not a valid marker!"
+    end
+    @marker = marker_choice
+    @@MARKERS.delete(marker_choice)
+  end
+  @marker
 end
 
 class Computer < Player
   attr_accessor :name, :score
 
   def initialize
-    @name = name
+    super
+    @name = "Robot Player"
     @score = 0
+  end
+
+  def choose_marker
+    @marker = @@MARKERS[0]
   end
 end
 
@@ -134,18 +155,16 @@ class Square
 end
 
 class TTTGame
-#   HUMAN_MARKER = " "
-#   COMPUTER_MARKER = " "
   CHOICES = ["player", "computer", "random"]
-  MARKERS = ["X", "O"]
+
 
   attr_reader :board, :human, :computer
 
   def initialize
     @board = Board.new
-    @human = Player.new#(HUMAN_MARKER)
-    @computer = Player.new#(COMPUTER_MARKER)
-    @current_marker = " "
+    @human = Human.new#(HUMAN_MARKER)
+    @computer = Computer.new#(COMPUTER_MARKER)
+    @first_player = ''
   end
 
   def play
@@ -153,7 +172,8 @@ class TTTGame
     display_welcome_message
     choose_player
     display_marker_message
-    choose_marker
+    human.choose_marker
+    computer.choose_marker
     main_game
     display_goodbye_message
   end
@@ -167,45 +187,8 @@ class TTTGame
     puts "Your choices are: #{CHOICES.each { |choice| choice }.join(', ')}"
   end
 
-  def choose_player
-    player_choice = ''
-    loop do
-      choice = gets.chomp.to_s
-      break if CHOICES.include?(player_choice)
-      puts "Sorry, that's not a valid answer"
-    end
-    binding.pry
-  end
-
-    # case choice
-    # when "player"
-    # #   @current_marker = HUMAN_MARKER
-    #   puts "You're going first!"
-    # when "computer"
-    # #   @current_marker = COMPUTER_MARKER
-    #   puts "The computer plays first!"
-    # when "random"
-    #   @current_marker = [MARKERS].sample
-    #   puts "We chose for you!"
-    # end
-  #end
-
   def display_marker_message
-    player = choose_player
-    puts "You're a #{player}"
-    puts "Choose a marker!"
-    puts "Your choices are X or 0"
-  end
-
-   def choose_marker
-    marker_choice = ''
-    loop do
-      marker_choice = gets.chomp.to_s.upcase
-      #binding.pry
-      break if MARKERS.include?(marker_choice)
-      puts "Sorry, that's not a valid marker!"
-    end
-    @current_marker = marker_choice
+    puts "Choose a marker! Your choices are: X or O."
   end
 
   def display_goodbye_message
@@ -217,6 +200,27 @@ class TTTGame
     puts ""
     board.draw
     puts ""
+  end
+
+   def choose_player
+    player_choice = nil
+    loop do
+      player_choice = gets.chomp.to_s
+      break if CHOICES.include?(player_choice)
+      puts "Sorry, that's not a valid answer"
+    end
+
+    case player_choice
+    when "player"
+     @current_marker = human.marker
+     puts "You're going first!"
+    when "computer"
+      @current_marker = computer.marker
+      puts "Robot plays first!"
+    when CHOICES[2]
+      @current_marker = [MARKERS].sample
+      puts "We chose for you!"
+    end
   end
 
   def clear
@@ -249,32 +253,31 @@ class TTTGame
       puts "Sorry, that's not a valid choice."
     end
     board[square] = human.marker
-    binding.pry
   end
 
   def computer_moves
-    if board.find_at_risk_square.size == 2
-      board[board.find_at_risk_square.select { |e| board.marked_keys.include?(e) }[0]] = computer.marker
-    elsif board.find_at_risk_square.size == 3
-      board[board.find_at_risk_square.select { |e| !board.marked_keys.include?(e) }[0]] = computer.marker
-    elsif board.unmarked_keys.include?(5)
-      board[board.unmarked_keys.select { |e| e == 5 }[0]] = computer.marker
-    else
+    # if board.find_at_risk_square.size == 2
+    #   board[board.find_at_risk_square.select { |e| board.marked_keys.include?(e) }[0]] = computer.marker
+    # elsif board.find_at_risk_square.size == 3
+    #   board[board.find_at_risk_square.select { |e| !board.marked_keys.include?(e) }[0]] = computer.marker
+    # elsif board.unmarked_keys.include?(5)
+    #  board[board.unmarked_keys.select { |e| e == 5 }[0]] = computer.marker
+    # else
       board[board.unmarked_keys.sample] = computer.marker
-    end
+    #end
   end
 
   def human_turn?
-    @current_marker == choose_marker
+    @current_marker == human.marker 
   end
 
   def current_player_moves
     if human_turn?
       human_moves
-      @current_marker = COMPUTER_MARKER
+      @current_marker = computer.marker
     else
       computer_moves
-      @current_marker = HUMAN_MARKER
+      @current_marker = human.marker
     end
   end
 
@@ -311,11 +314,13 @@ class TTTGame
     end
   end
 
+
   def main_game
     human_score = 0
     computer_score = 0
     loop do
       display_board
+       #  binding.pry
       player_move
       display_result
       human_score += 1 if human_won?
