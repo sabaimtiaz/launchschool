@@ -1,52 +1,59 @@
 require 'pry'
 
-
 class Player
   attr_accessor :marker
 
-  def initialize #(marker)
+  def initialize
     @marker = marker
-    @@MARKERS = ["X", "O"]
+    @@game_markers = ["X", "O"]
   end
 end
 
 class Human < Player
+  attr_accessor :name
 
-  attr_accessor :name, :score
   def initialize
     super
     @name = name
-    @score = 0
-  end
-
-   def choose_marker
-    marker_choice = ''
-    loop do
-      marker_choice = gets.chomp.to_s.upcase
-      break if @@MARKERS.include?(marker_choice)
-      puts "Sorry, that's not a valid marker!"
-    end
-    @marker = marker_choice
-    @@MARKERS.delete(marker_choice)
-  end
-  @marker
-end
-
-class Computer < Player
-  attr_accessor :name, :score
-
-  def initialize
-    super
-    @name = "Robot Player"
-    @score = 0
   end
 
   def choose_marker
-    @marker = @@MARKERS[0]
+    marker_choice = ''
+    loop do
+      marker_choice = gets.chomp.to_s.upcase
+      break if @@game_markers.include?(marker_choice)
+      puts "Sorry, that's not a valid marker!"
+    end
+    @marker = marker_choice
+    @@game_markers.delete(marker_choice)
+  end
+
+  def enter_name
+    player_name = ''
+    loop do
+      puts "Enter your name:"
+      player_name = gets.chomp
+      break if player_name.scan(/[^a-zA-Z]/).empty?
+      puts "Sorry, no numbers or characters allowed!"
+    end
+    @name = player_name
   end
 end
 
-class Board 
+class Computer < Player
+  attr_accessor :name
+
+  def initialize
+    super
+    @name = "Robot"
+  end
+
+  def choose_marker
+    @marker = @@game_markers[0]
+  end
+end
+
+class Board
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                   [[1, 5, 9], [3, 5, 7]]
@@ -94,7 +101,7 @@ class Board
     !!winning_marker
   end
 
-  def winning_marker # return winning marker or return nil
+  def winning_marker
     WINNING_LINES.each do |line|
       squares = @squares.values_at(*line)
       if three_identical_markers?(squares)
@@ -121,7 +128,7 @@ class Board
 
   def two_identical_markers?(squares)
     markers = squares.select(&:marked?).collect(&:marker)
-    return false if markers.size != 2
+    return false if markers.size != 2 && !markers.uniq.empty?
     markers.uniq.size == 1
   end
 
@@ -156,24 +163,21 @@ end
 
 class TTTGame
   CHOICES = ["player", "computer", "random"]
-
-
   attr_reader :board, :human, :computer
 
   def initialize
     @board = Board.new
-    @human = Human.new#(HUMAN_MARKER)
-    @computer = Computer.new#(COMPUTER_MARKER)
-    @first_player = ''
+    @human = Human.new
+    @computer = Computer.new
   end
 
   def play
     clear
     display_welcome_message
-    choose_player
     display_marker_message
-    human.choose_marker
-    computer.choose_marker
+    select_marker
+    choose_player
+    enter_player_name
     main_game
     display_goodbye_message
   end
@@ -183,8 +187,11 @@ class TTTGame
   def display_welcome_message
     puts "Welcome to Tic Tac Toe!"
     puts ""
+  end
+
+  def display_choose_player_message
     puts "Choose who goes first."
-    puts "Your choices are: #{CHOICES.each { |choice| choice }.join(', ')}"
+    puts "Your choices are: #{CHOICES.each { |e| }.join(', ')}"
   end
 
   def display_marker_message
@@ -196,15 +203,17 @@ class TTTGame
   end
 
   def display_board
-    puts "You're a #{human.marker}. Computer is a #{computer.marker}."
+    puts "#{human.name} is #{human.marker}."
+    puts "#{computer.name} is a #{computer.marker}."
     puts ""
     board.draw
     puts ""
   end
 
-   def choose_player
+  def choose_player
     player_choice = nil
     loop do
+      display_choose_player_message
       player_choice = gets.chomp.to_s
       break if CHOICES.include?(player_choice)
       puts "Sorry, that's not a valid answer"
@@ -212,15 +221,24 @@ class TTTGame
 
     case player_choice
     when "player"
-     @current_marker = human.marker
-     puts "You're going first!"
+      @current_marker = human.marker
+      puts "You're going first!"
     when "computer"
       @current_marker = computer.marker
-      puts "Robot plays first!"
+      puts "#{computer.name} plays first!"
     when CHOICES[2]
-      @current_marker = [MARKERS].sample
+      @current_marker = [human.marker, computer.marker].sample
       puts "We chose for you!"
     end
+  end
+
+  def enter_player_name
+    human.enter_name
+  end
+
+  def select_marker
+    human.choose_marker
+    computer.choose_marker
   end
 
   def clear
@@ -231,7 +249,7 @@ class TTTGame
     clear
     display_board
   end
-  
+
   def joinor(array, punct = ', ', joiner='or')
     case array.size
     when 0 then ''
@@ -256,19 +274,19 @@ class TTTGame
   end
 
   def computer_moves
-    # if board.find_at_risk_square.size == 2
-    #   board[board.find_at_risk_square.select { |e| board.marked_keys.include?(e) }[0]] = computer.marker
-    # elsif board.find_at_risk_square.size == 3
-    #   board[board.find_at_risk_square.select { |e| !board.marked_keys.include?(e) }[0]] = computer.marker
-    # elsif board.unmarked_keys.include?(5)
-    #  board[board.unmarked_keys.select { |e| e == 5 }[0]] = computer.marker
-    # else
+    if board.find_at_risk_square.size == 2
+      board[board.find_at_risk_square] << computer.marker
+    elsif board.find_at_risk_square.size == 3
+      board[board.find_at_risk_square.select { |e| !board.marked_keys.include?(e) }[0]] = computer.marker
+    elsif board.unmarked_keys.include?(5)
+      board[board.unmarked_keys.select { |e| e == 5 }[0]] = computer.marker
+    else
       board[board.unmarked_keys.sample] = computer.marker
-    #end
+    end
   end
 
   def human_turn?
-    @current_marker == human.marker 
+    @current_marker == human.marker
   end
 
   def current_player_moves
@@ -306,21 +324,19 @@ class TTTGame
   def display_result
     clear_screen_and_display_board
     if human_won?
-      puts "You won!"
+      puts "#{human.name} won!"
     elsif computer_won?
-      puts "Computer won!"
+      puts "#{computer.name} won!"
     else
       puts "It's a tie!"
     end
   end
-
 
   def main_game
     human_score = 0
     computer_score = 0
     loop do
       display_board
-       #  binding.pry
       player_move
       display_result
       human_score += 1 if human_won?
