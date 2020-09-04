@@ -1,7 +1,5 @@
-require 'pry'
-
 class Player
-  attr_accessor :marker
+  attr_reader :marker
 
   def initialize
     @marker = marker
@@ -10,11 +8,12 @@ class Player
 end
 
 class Human < Player
-  attr_accessor :name
+  attr_accessor :name, :score
 
   def initialize
     super
     @name = name
+    @score = 0
   end
 
   def choose_marker
@@ -41,11 +40,12 @@ class Human < Player
 end
 
 class Computer < Player
-  attr_accessor :name
+  attr_accessor :name, :score
 
   def initialize
     super
     @name = "Robot"
+    @score = 0
   end
 
   def choose_marker
@@ -162,7 +162,7 @@ class Square
 end
 
 class TTTGame
-  CHOICES = ["player", "computer", "random"]
+  CHOICES = ["player", "computer"]
   attr_reader :board, :human, :computer
 
   def initialize
@@ -203,8 +203,8 @@ class TTTGame
   end
 
   def display_board
-    puts "#{human.name} is #{human.marker}."
-    puts "#{computer.name} is a #{computer.marker}."
+    puts "#{human.name}'s marker is #{human.marker}."
+    puts "#{computer.name}'s marker is #{computer.marker}."
     puts ""
     board.draw
     puts ""
@@ -226,9 +226,6 @@ class TTTGame
     when "computer"
       @current_marker = computer.marker
       puts "#{computer.name} plays first!"
-    when CHOICES[2]
-      @current_marker = [human.marker, computer.marker].sample
-      puts "We chose for you!"
     end
   end
 
@@ -333,23 +330,42 @@ class TTTGame
   end
 
   def main_game
-    human_score = 0
-    computer_score = 0
     loop do
       display_board
       player_move
       display_result
-      human_score += 1 if human_won?
-      computer_score += 1 if computer_won?
-      if human_score == 5 || computer_score == 5
-        puts "Max score reached!"
-        human_score = 0
-        computer_score = 0
-      end
+      process_score
       break unless play_again?
       reset
       display_play_again_message
     end
+  end
+
+  def process_score
+    calculate_score
+    display_score
+    max_score
+  end
+
+  def calculate_score
+    human.score += 1 if human_won?
+    computer.score += 1 if computer_won?
+  end
+
+  def display_score
+    puts "#{human.name} scored #{human.score}"
+    puts "#{computer.name} scored #{computer.score}"
+  end
+
+  def reset_score
+    human.score = 0
+    computer.score = 0
+  end
+
+  def max_score
+    return unless human.score == 2 || computer.score == 2
+    puts "Max score reached!"
+    reset_score
   end
 
   def play_again?
