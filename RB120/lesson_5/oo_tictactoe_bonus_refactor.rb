@@ -112,25 +112,16 @@ class Board
     nil
   end
 
-  # def find_at_risk_square 
-  #   WINNING_LINES.each do |line|
-  #   squares = @squares.values_at(*line)
-  #     if two_identical_markers?(squares) 
-  #       unmarked_keys.select { |key| return key if line.include?(key)}
-  #     end
-  #   end
-  # end
-
-  def square_to_mark(line)
-    @squares.select {|k, v| line.include?(k) && v.marker == " "}.keys.first
-  end
-
-  def find_at_risk_square(player_mkr, line)
-    square_to_mark(line) if count_squares(player_mkr, line) == 2
-  end
-
   def count_squares(player_mkr, line)
-    @squares.values_at(*line).select(&:marked?).collect(&:marker).count { |elem| elem == player_mkr }
+    @squares.values_at(*line).select(&:marked?).collect(&:marker).count { |elem| elem == player_mkr}
+  end
+
+  def find_at_risk_square(player_mkr)
+    WINNING_LINES.each do |line|
+      if count_squares(player_mkr, line) == 2
+        unmarked_keys.select { |key| return key if line.include?(key)}
+      end
+    end
   end
 
   def reset
@@ -139,11 +130,11 @@ class Board
 
  private
 
-  # def two_identical_markers?(squares)
-  #   markers = squares.select(&:marked?).collect(&:marker)
-  #   return false if markers.size != 2 && !markers.uniq.empty? 
-  #   markers.uniq.size == 1 
-  # end
+  def two_identical_markers?(squares)
+    markers = squares.select(&:marked?).collect(&:marker)
+    return false if markers.size != 2 && !markers.uniq.empty? 
+    markers.uniq.size == 1 
+  end
 
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).collect(&:marker)
@@ -296,36 +287,16 @@ class TTTGame
   end
 
   def computer_moves
-    square = computer_tactic(human.marker)
-    square = computer_tactic(computer.marker) if square.nil?
-    if square.nil?
-      if board.unmarked_keys.include?(5)
-        square = 5
-      else
-        square = board.unmarked_keys.sample
-      end
+   if board.find_at_risk_square(computer.marker).is_a? Integer 
+      board[board.find_at_risk_square(computer.marker)] = computer.marker
+    elsif
+      board.find_at_risk_square(human.marker).is_a? Integer
+      board[board.find_at_risk_square(human.marker)] = computer.marker
+    elsif board.unmarked_keys.include?(5)
+      board[5] = computer.marker
+    else
+      board[board.unmarked_keys.sample] = computer.marker
     end
-    board[square] = computer.marker
-  end
-
-  # def computer_moves
-  #   binding.pry
-  #  if board.find_at_risk_square(human.marker).is_a? Integer 
-  #     board[board.find_at_risk_square(human.marker)] = computer.marker
-  #   elsif board.unmarked_keys.include?(5)
-  #     board[5] = computer.marker
-  #   else
-  #     board[board.unmarked_keys.sample] = computer.marker
-  #   end
-  # end
-
-  def computer_tactic(marker)
-    square = nil
-    Board::WINNING_LINES.each do |line|
-      square = board.find_at_risk_square(marker, line)
-      break if square
-    end
-    square
   end
 
   def human_turn?
