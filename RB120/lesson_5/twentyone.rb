@@ -32,6 +32,10 @@ module Hand
         total += card
       end
     end
+
+    values.select { |card| card == "Ace" }.count.times do
+      total -= 10 if total <= 21
+    end
     total
   end
 
@@ -42,7 +46,7 @@ module Hand
   def show_hand
     str = ''
     cards.each { |card| str << "#{card[0]} of #{card[1]}, " }
-    p str.slice(0..-3)
+    str.slice(0..-3)
   end
 end
 
@@ -64,11 +68,6 @@ class Player
       puts "Sorry, no numbers or characters allowed!"
     end
     @name = player_name
-  end
-
-  def show_player_hand
-    "#{@name} has:"
-    show_hand
   end
 end
 
@@ -99,14 +98,17 @@ class Game
     display_goodbye_message
   end
 
+  def setup_game
+    deal_cards
+    show_initial_cards
+  end
+
   def main_game
     loop do
-      deal_cards
-      show_initial_cards
+      setup_game
       player_turn
       dealer_turn
       display_busted_message
-      show_winner
       show_result
       break unless play_again?
       reset_game
@@ -122,16 +124,13 @@ class Game
   end
 
   def show_initial_cards
-    puts "#{human.name}'s cards:"
-    human.show_hand
+    puts "#{human.name}'s cards: #{human.show_hand}"
     puts ""
-    puts "Dealer's cards:"
-    dealer.show_hand
+    puts "Dealer's cards: #{dealer.show_hand}"
   end
 
   def player_turn
     loop do
-      puts " "
       puts "Would you like to (h)it or (s)tay?"
       answer = nil
       loop do
@@ -147,9 +146,7 @@ class Game
         break
       else
         human.add_card(deck.deal_one_card)
-        puts "#{human.name} hits!"
-        puts "#{human.name} has:"
-        human.show_hand
+        puts "#{human.name} hits! #{human.name} has #{human.show_hand}"
         break if human.busted?
       end
     end
@@ -164,16 +161,21 @@ class Game
       elsif dealer.busted?
         break
       else
-        puts "Dealer hits!"
-        puts "Dealer had:"
-        dealer.show_hand
+        clear
+        puts "Dealer hits! Dealer had: #{dealer.show_hand}"
         dealer.add_card(deck.deal_one_card)
       end
     end
   end
 
+  def show_result
+    show_winner
+    show_final_cards
+  end
+
   def show_winner
     puts "The result is..."
+    puts ""
     if dealer.busted? && human.total <= 21
       puts "#{human.name} wins!"
     elsif human.busted? && dealer.total <= 17
@@ -183,13 +185,11 @@ class Game
     end
   end
 
-  def show_result
-    puts "#{human.name} had:"
-    human.show_hand
+  def show_final_cards
+    puts "#{human.name} had: #{human.show_hand}"
     puts "The total value of the cards was #{human.total}"
     puts "----------------------------------------------------"
-    puts "Dealer had:"
-    dealer.show_hand
+    puts "Dealer had: #{dealer.show_hand}"
     puts "The total value of Dealer's cards was #{dealer.total}"
   end
 
@@ -209,7 +209,6 @@ class Game
     self.deck = Deck.new
     human.cards = []
     dealer.cards = []
-
   end
 
   private
@@ -225,6 +224,7 @@ class Game
   end
 
   def display_busted_message
+    puts " "
     if human.busted?
       puts "#{human.name} busted!"
       puts "----------------------"
@@ -241,6 +241,7 @@ class Game
   end
 
   def display_goodbye_message
+    clear
     puts "Thanks for playing Twenty-One! Goodbye!"
   end
 
