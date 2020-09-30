@@ -29,7 +29,11 @@ module Hand
                else
                  card
                end
-    end
+    end 
+    correct_for_aces(values, total)
+  end
+
+  def correct_for_aces(values, total)
     values.select { |_| "Ace" }.count.times do
       break if total <= 21
       total -= 10
