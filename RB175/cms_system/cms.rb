@@ -3,6 +3,8 @@ require 'sinatra/content_for'
 require 'tilt/erubis'
 require 'sinatra/reloader' if development?
 require 'redcarpet'
+require 'yaml'
+require 'bcrypt'
 
 configure do 
   enable :sessions
@@ -24,6 +26,8 @@ get '/signout' do
 end
 
 get '/new' do
+  require_sign_in
+
   erb :new
 end
 
@@ -31,33 +35,53 @@ get '/users/signin' do
   erb :signin
 end
 
+def load_users
+  users_path = if ENV["RACK_ENV"] == 'test'
+    File.expand_path("../test/data/users.yml", __FILE__)
+  else
+    File.expand_path('../data/users.yml', __FILE__)
+  end
+  YAML.load_file(users_path)
+end
+
 post '/users/signin' do
-  session[:username] = params[:username]
-  @password = params[:password]
-  error = params[:username] != "admin"|| params[:password] != "secret"
-  if error
+  username = params[:username]
+  credentials = load_users
+  if is_password_encrypted?(username, params[:password])
     session[:username] = params[:username]
+    session[:success] = 'Welcome!'
+    redirect '/'
+  else 
     session[:error] = "Invalid credentials"
     status 422
     erb :signin
-  elsif
-    session[:success] = "Welcome!"
-    redirect '/'
+  end
+end
+
+def is_password_encrypted?(username, password)
+  credentials = load_users 
+  if credentials.key?(username)
+    bcrypt_password = BCrypt::Password.new(credentials[username]) 
+    bcrypt_password == password
+  else
+    false
   end
 end
 
 post '/create' do
+  require_sign_in
   filename = params[:filename].to_s
-  if filename.size <= 1
+  file_path = File.join(data_path, filename)
+  if !is_extension_valid?(File.extname(file_path))
+    session[:error] = 'The extension is not valid'
+    status 422
+    erb :new
+  elsif
+    filename.size <= 1
     session[:error] = 'A name is required'
     status 422
     erb :new
-  elsif File.extname(filename) == ""
-    session[:error] = 'A file extension is required'
-    status 422
-    erb :new
   else
-    file_path = File.join(data_path, filename)
     File.write(file_path, "")
     session[:message] = "#{filename} has been created."
     redirect '/'
@@ -65,6 +89,7 @@ post '/create' do
 end
 
 get '/:filename/edit' do
+  require_sign_in
   file_path = File.join(data_path, params[:filename])
   @filename = params[:filename]
   @text = File.read(file_path)
@@ -80,10 +105,22 @@ def data_path
 end
 
 post '/:filename/delete' do
+  require_sign_in
   file_path = File.join(data_path, params[:filename])
   File.delete(file_path)
   session[:message] = "#{params[:filename]} has been deleted"
   redirect '/'
+end
+
+def user_signed_in?
+  session[:username] == "admin"
+end
+
+def require_sign_in
+  unless user_signed_in?
+    session[:message] = "You must be signed in to do that."
+    redirect '/'
+  end
 end
 
 def render_markdown(text)
@@ -93,6 +130,7 @@ end
 
 def view_file_content(path)
   content = File.read(path)
+
   case File.extname(path)
   when ".txt"
     headers["Content-Type"] = "text/plain"
@@ -102,6 +140,10 @@ def view_file_content(path)
   else
     content
   end
+end
+
+def is_extension_valid?(ext)
+  [".pdf", ".txt", ".docx", ".pages"].include?(ext)
 end
 
 get '/:filename' do 
@@ -115,6 +157,7 @@ get '/:filename' do
 end
 
 post '/:filename' do
+  require_sign_in
   file_path = File.join(data_path, params[:filename])
   @text = File.write(file_path, params[:text])
 
