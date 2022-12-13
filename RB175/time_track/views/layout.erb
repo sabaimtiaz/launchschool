@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en-US">
+  <link rel="stylesheet" href="/stylesheets/cms.css">
+  <body>
+  <meta charset="UTF-8">
+    <% if session[:message] %>
+      <p class="message"><%= session.delete(:message) %></p>
+    <% elsif session[:error] %>
+      <p class="message"><%= session.delete(:error) %></p> 
+    <% elsif session[:success] %>
+      <p class="message"><%= session.delete(:success) %></p> 
+       <% elsif session[:start] %>
+      <p class="message"><%= session.delete(:start) %></p>
+      <% elsif session[:ending] %>
+      <p class="message"><%= session.delete(:ending) %></p> 
+    <% end %>
+    <%= yield %>
+  </body>  
+</html>
