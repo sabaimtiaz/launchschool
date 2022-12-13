@@ -14,6 +14,18 @@ class AppTest < Minitest::Test
     Sinatra::Application
   end
 
+  def admin_session
+    { 'rack.session' => { username: "admin" } }
+  end
+
+  # def session
+  #   last_request.env["rack.session"]
+  # end
+
+  def test_index_as_signed_in_user
+    get '/',{}, admin_session
+  end
+
   def setup
     FileUtils.mkdir_p(data_path)
   end
@@ -24,10 +36,6 @@ class AppTest < Minitest::Test
 
   def session
     last_request.env["rack.session"]
-  end
-
-  def test_index_as_signed_in_user
-    get '/',{}, {"rack.session" => { username: "admin"}}
   end
 
   def test_index
@@ -65,23 +73,28 @@ class AppTest < Minitest::Test
   # end
 
   def test_view_new_doc
-    get '/new'
+    get '/new', {}, admin_session
     assert_equal 200, last_response.status
-    assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
+ #   assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
     assert_includes last_response.body, "<input "
     assert_includes last_response.body, %q(<button type="submit")
   end
 
   def test_create_new_doc
-    post '/create', filename: "testing.txt"
+    post '/create', {filename: "testing.txt"}, admin_session
     assert_equal 302, last_response.status
 
     get last_response["Location"]
     assert_includes last_response.body, "testing.txt has been created."
   end
 
+  def test_create_new_doc_signed_out
+    post '/create', { filenam: 'test.txt' }
+    assert_equal "You must be signed in to do that.", session[:message]
+  end
+
   def test_no_filename_error
-    post '/create', filename: " "
+    post '/create', {filename: " "}, admin_session
     assert_equal 422, last_response.status
     assert_includes last_response.body, "A name is required"
   end
@@ -120,15 +133,22 @@ class AppTest < Minitest::Test
   def test_edit
     create_document "changes.txt"
 
-    get '/changes.txt/edit'
+    get '/changes.txt/edit', {}, admin_session
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<textarea"
     assert_includes last_response.body, "<button type=\"submit\""
   end
 
+  def test_editing_signed_out
+    create_document 'changes.txt'
+    get '/changes.txt/edit'
+    assert_equal 302, last_response.status
+    assert_equal "You must be signed in to do that.", session[:message]
+  end
+
   def test_delete
     create_document "testing.txt"
-    post "/testing.txt/delete"
+    post "/testing.txt/delete", {}, admin_session
     assert_equal 302, last_response.status
 
     get last_response["Location"]
@@ -138,17 +158,27 @@ class AppTest < Minitest::Test
     refute_includes last_response.body, "testing.txt"
   end
 
-  def test_updating_document
-    post "/changes.txt", text: "new idea!"
+  def test_delete_signed_out
+    create_document "testing.txt"
+    post "/testing.txt/delete"
     assert_equal 302, last_response.status
+    assert_equal "You must be signed in to do that.", session[:message]
+  end
 
-    get last_response["Location"]
-
-    assert_includes last_response.body, "changes.txt has been edited"
+  def test_updating_document
+    post "/changes.txt", {text: "new idea!"}, admin_session
+    assert_equal 302, last_response.status
+    assert_equal "changes.txt has been edited.", session[:message]
 
     get '/changes.txt'
     assert_equal 200, last_response.status
     assert_includes last_response.body, "new idea!"
+  end
+
+  def test_updating_doc_signed_out
+    post "/changes.txt", {text: "new idea!"} 
+    assert_equal 302, last_response.status
+    assert_equal "You must be signed in to do that.", session[:message]
   end
 
   def create_document(name, content = "")

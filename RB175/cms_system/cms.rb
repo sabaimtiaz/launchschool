@@ -5,6 +5,7 @@ require 'sinatra/reloader' if development?
 require 'redcarpet'
 require 'yaml'
 require 'bcrypt'
+require 'fileutils'
 
 configure do 
   enable :sessions
@@ -36,10 +37,10 @@ get '/users/signin' do
 end
 
 def load_users
-  users_path = if ENV["RACK_ENV"] == 'test'
-    File.expand_path("../test/data/users.yml", __FILE__)
+  users_path = if env["RACK_ENV"] == 'test'
+    File.expand_path("../users.yml", __FILE__)
   else
-    File.expand_path('../data/users.yml', __FILE__)
+    File.expand_path('../users.yml', __FILE__)
   end
   YAML.load_file(users_path)
 end
@@ -96,6 +97,15 @@ get '/:filename/edit' do
   erb :edit
 end
 
+post '/:filename/duplicate' do
+  file_path = File.join(data_path, params[:filename])
+  new_path = File.join(data_path, "#{params[:filename]}-copy")
+  File.write(new_path, " ")
+  FileUtils.cp(file_path, new_path)  
+  session[:message] = "#{params[:filename]} has been duplicated."
+  redirect '/'
+end
+
 def data_path
   if ENV["RACK_ENV"] == "test"
     File.expand_path('../test/data', __FILE__)
@@ -113,7 +123,8 @@ post '/:filename/delete' do
 end
 
 def user_signed_in?
-  session[:username] == "admin"
+  credentials = load_users
+  credentials.key?(params[:username]) 
 end
 
 def require_sign_in
@@ -137,10 +148,20 @@ def view_file_content(path)
     content
   when ".md"
     erb render_markdown(content)
-  else
-    content
   end
 end
+
+get '/view' do
+  file_path = File.join(data_path, File.basename(params[:filename]))
+
+  if File.exist?(file_path)
+    view_file_content(file_path)
+  else
+    session[:message] = "#{params[:filename]} does not exist."
+    redirect '/'
+  end
+end
+
 
 def is_extension_valid?(ext)
   [".pdf", ".txt", ".docx", ".pages"].include?(ext)

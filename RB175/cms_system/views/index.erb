@@ -1,8 +1,10 @@
-
 <ul>
   <% @contents.each do |doc| %>
     <li><a href="<%=doc %>"><%= doc %></a>
       <a href="<%=doc %>/edit"> *edit</a> 
+      <form class="inline" method="post" action="<%=doc %>/duplicate"> 
+        <button type="submit">Duplicate</button>
+      </form>
       <form class="inline" method="post" action="<%=doc %>/delete"> 
         <button type="submit">Delete</button>
       </form>
@@ -14,7 +16,7 @@
 <p>
 
 <% if session[:success] %>
- <i>Signed in as <%= session[:username] %></i></div><p>
+ <i>Signed in as <%= @username %></i></div><p>
  <a href="/signout"><button type="submit" action="signout">Sign out</button></a>
  <p>
 <% else %>
