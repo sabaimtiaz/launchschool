@@ -3,8 +3,8 @@ require 'sinatra/content_for'
 require 'tilt/erubis'
 require 'sinatra/reloader' if development?
 require 'pry'
+require 'time'
 require 'date'
-require 'csv'
 
 configure do 
   enable :sessions
@@ -55,58 +55,60 @@ get '/all_records' do
   erb :all_records, layout: :layout
 end
 
-
-def show_record
-  session[:records].each { |hsh| hsh }
-end
-
 post '/all_records' do 
  check_for_entry_errors
- session[:records] << {id: (params[:id].to_i + 1), project: params[:project], task: params[:task], rate: params[:rate], starttime: Time.now }
+ p check_duplicates(params[:project], params[:task])
+ session[:records] << {id: (params[:id].to_i + 1), project: params[:project], task: params[:task], rate: params[:rate], starttime: Time.now.to_s }
  redirect '/live_track'
 end
 
-post 'all_records/:project/delete' do
-  delete_record(params[:project])
-  redirect '/'
-end
+# get '/all_records/:project' do 
+#   project = params[:project]
+#   session[:message] = "You're viewing #{project}, a part of #{session[:records]}"
+# end
 
-get '/all_records/:project' do 
-
-  project = params[:project]
-  session[:message] = "You're viewing #{project}, a part of #{session[:records]}"
-
-end
-
-post '/all_records/:project/delete' do
-  project = params[:project]
-  delete_record(session[:records], project)
-  session[:records].delete_if { |hsh| hsh[:project] == project }
-  session[:message] = "#{project} has been deleted."
+post '/all_records/:task/delete' do
+  task = params[:task]
+  session[:records].delete_if { |hsh| hsh[:task] == task }
+  session[:message] = "#{task} has been deleted."
   redirect '/all_records'
 end
 
-def delete_record(hsh, record)
-  hsh.delete_if {|h| h[:record] == record }
-end
-
 def check_for_entry_errors
-   if params[:rate].to_i == 0
+  if params[:rate].to_i == 0
     session[:error] = "Please enter a number for the rate"
     redirect '/live_track/new'
   elsif params[:project].length <= 1 || params[:task].length <= 1
     session[:error] = "The field needs to have more than 1 characters"
-  # check to see we dont have the same project here
     redirect '/live_track/new'
-  }
   end
 end
+
+def check_duplicates(project, task)
+  session[:records].select { |hsh| hsh.value?(project) } 
+end
+
+def calculate_pay
+  seconds = 3600
+  rate = params[:rate]
+  rate / seconds
+end
+
+
+# def calculate_time
+#   @current = session[:records][-1]
+#   start (Time.parse(@current[:endtime]).to_s) - (Time.parse(@current[:starttime]).to_s)
+#   (endtime - starttime) / 3600
+# end
 
 get '/live_track/end' do
   @current = session[:records][-1]
   @current[:endtime] = Time.now
   session[:records][-1][:endtime] = Time.now
-  session[:message] = "You finished #{@current[:task]} at #{@current[:endtime].strftime(%"%k:%M")}"
+  #@current[:pay] = (time / 60) * pay
+ # session[:records][-1][:pay] = @current[:pay]
+  session[:message] = "You finished #{@current[:task]} at #{@current[:endtime].strftime(%"%k:%M")}."
+  #You made #{@current[:pay]}"
   #session[:records][-1][:pay] 
   @current = nil
   redirect '/all_records'

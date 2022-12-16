@@ -1,12 +1,16 @@
+<% if @records.empty? %>
+  <p>There are no entries. Click here to <a href="/live_track/new">start recording.</a></p>
+<% end %>
+
 <ul id="records">
   <% @records.each do |record| %>
-    <li><a href="all_records/<%= record[:id] %>">ID: <%= record[:id] %></a></li>
-    <li><a href="all_records/<%= record[:project] %>">Project: <%= record[:project] %></a></li>
+    <li>ID: <%= record[:id] %></li>
+    <li>Project: <%= record[:project] %></li>
     <li>Task: <%= record[:task] %></li>
     <li>Rate: $<%= record[:rate] %></li>
     <li>Start Time: <%= record[:starttime] %></li>
     <li>End Time: <%= record[:endtime] %></li>
-    <form method="post" action="/all_records/<%= record[:project] %>/delete" class="delete"><button type="submit">Delete entry</button></form>
+    <form method="post" action="/all_records/<%= record[:task] %>/delete" class="delete"><button type="submit">Delete task</button></form>
     <p>
 <% end %>
 </ul>
