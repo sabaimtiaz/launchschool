@@ -57,19 +57,15 @@ end
 
 post '/all_records' do 
  check_for_entry_errors
- p check_duplicates(params[:project], params[:task])
- session[:records] << {id: (params[:id].to_i + 1), project: params[:project], task: params[:task], rate: params[:rate], starttime: Time.now.to_s }
+ params[:id] = session[:records].size + 1
+ session[:records] << {id: params[:id], project: params[:project], task: params[:task], rate: params[:rate], starttime: Time.now.to_s }
  redirect '/live_track'
 end
 
-# get '/all_records/:project' do 
-#   project = params[:project]
-#   session[:message] = "You're viewing #{project}, a part of #{session[:records]}"
-# end
-
-post '/all_records/:task/delete' do
-  task = params[:task]
-  session[:records].delete_if { |hsh| hsh[:task] == task }
+post '/all_records/:id/delete' do
+  id = params[:id].to_i
+  task = session[:records][id][:task]
+  session[:records].delete_at(id)
   session[:message] = "#{task} has been deleted."
   redirect '/all_records'
 end
@@ -82,10 +78,6 @@ def check_for_entry_errors
     session[:error] = "The field needs to have more than 1 characters"
     redirect '/live_track/new'
   end
-end
-
-def check_duplicates(project, task)
-  session[:records].select { |hsh| hsh.value?(project) } 
 end
 
 def calculate_pay
