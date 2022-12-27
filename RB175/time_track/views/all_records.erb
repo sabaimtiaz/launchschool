@@ -4,7 +4,6 @@
 
 <ul id="records">
   <% @records.each do |record| %>
-    <li>Project: <%= record[:id] %></li>
     <li>Project: <%= record[:project] %></li>
     <li>Task: <%= record[:task] %></li>
     <li>Rate: $<%= record[:rate] %></li>
@@ -12,7 +11,7 @@
     <li>End Time: <%= record[:endtime] %></li>
     <p>
       <% if record[:endtime].nil? %>
-        <a href="/live_track/end">End tracking</a><p>
+        <form method="get" action="/live_track/<%= record[:id] %>/end"><a href="/live_track/<%= record[:id] %>/end">End tracking</a></form><p>
       <% end %>
     <form method="post" action="/all_records/<%= record[:id] %>/delete" class="delete"><button type="submit">Delete task</button>
     </form>  

@@ -1,6 +1,6 @@
 <% if @current[:endtime].nil? %>
-<p> You began working on <%= @current[:task] %> at <%= @records[-1][:starttime] %> </p>
-<a href="/live_track/end">End tracking</a><p>
+<p> You began working on <%= @current[:task] %> at <%= @current[:starttime] %> </p>
+<a href="/live_track/<%= @current[:id] %>/end">End tracking</a><p>
 <% end %>
 
 <a href="/live_track/new">New record</a><p>

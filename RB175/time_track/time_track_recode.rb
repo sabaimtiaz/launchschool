@@ -31,6 +31,7 @@ post '/users/login' do
     redirect '/'
   else
     session[:error] = "Try again with the correct username and/or password"
+    status 422
     erb :login
   end
 end
@@ -57,7 +58,7 @@ end
 
 post '/all_records' do 
  check_for_entry_errors
- params[:id] = session[:records].size + 1
+ params[:id] = session[:records].size 
  session[:records] << {id: params[:id], project: params[:project], task: params[:task], rate: params[:rate], starttime: Time.now.to_s }
  redirect '/live_track'
 end
@@ -65,7 +66,7 @@ end
 post '/all_records/:id/delete' do
   id = params[:id].to_i
   task = session[:records][id][:task]
-  session[:records].delete_at(id)
+  session[:records].delete_at(id-1)
   session[:message] = "#{task} has been deleted."
   redirect '/all_records'
 end
@@ -80,30 +81,23 @@ def check_for_entry_errors
   end
 end
 
+def format_date(date)
+  Time.parse(date)
+end
+
 def calculate_pay
-  seconds = 3600
-  rate = params[:rate]
-  rate / seconds
+  id = params[:id].to_i
+  start = format_date(session[:records][id][:starttime])
+  ending = format_date(session[:records][id][:endtime])
+  (ending-start)/3600 * (session[:records][id][:rate].to_i).round(2)  
 end
 
-
-# def calculate_time
-#   @current = session[:records][-1]
-#   start (Time.parse(@current[:endtime]).to_s) - (Time.parse(@current[:starttime]).to_s)
-#   (endtime - starttime) / 3600
-# end
-
-get '/live_track/end' do
-  @current = session[:records][-1]
-  @current[:endtime] = Time.now
-  session[:records][-1][:endtime] = Time.now
-  #@current[:pay] = (time / 60) * pay
- # session[:records][-1][:pay] = @current[:pay]
-  session[:message] = "You finished #{@current[:task]} at #{@current[:endtime].strftime(%"%k:%M")}."
-  #You made #{@current[:pay]}"
-  #session[:records][-1][:pay] 
-  @current = nil
-  redirect '/all_records'
+get '/live_track/:id/end' do
+  id = params[:id].to_i
+  session[:records][id][:endtime] = Time.now.to_s
+  earnings = calculate_pay
+  task = session[:records][id][:task]
+  session[:message] = "You finished #{task} at #{Time.now.strftime(%"%k:%M")} and made $#{earnings}"
+  redirect '/live_track'
 end
-
 
