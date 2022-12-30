@@ -53,6 +53,7 @@ get '/live_track/new' do
 end
 
 get '/all_records' do 
+  @records = session[:records]
   erb :all_records, layout: :layout
 end
 
@@ -65,10 +66,17 @@ end
 
 post '/all_records/:id/delete' do
   id = params[:id].to_i
-  task = session[:records][id][:task]
-  session[:records].delete_at(id-1)
-  session[:message] = "#{task} has been deleted."
-  redirect '/all_records'
+  if session[:records].size == 1
+    task = session[:records][0][:task]
+    session[:records].delete_at(0)
+    session[:message] = "#{task} has been deleted."
+    redirect '/all_records'
+  else
+    task = session[:records][id][:task]
+    session[:records].delete_at(id)
+    session[:message] = "#{task} has been deleted."
+    redirect '/all_records'
+  end
 end
 
 def check_for_entry_errors
@@ -97,7 +105,6 @@ get '/live_track/:id/end' do
   session[:records][id][:endtime] = Time.now.to_s
   earnings = calculate_pay
   task = session[:records][id][:task]
-  session[:message] = "You finished #{task} at #{Time.now.strftime(%"%k:%M")} and made $#{earnings}"
+  session[:message] = "You finished #{task} at #{Time.now.strftime(%"%k:%M")} and made $#{earnings.round(2)}"
   redirect '/live_track'
 end
-
