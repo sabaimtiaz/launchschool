@@ -2,13 +2,13 @@ require 'sinatra'
 require 'sinatra/content_for'
 require 'tilt/erubis'
 require 'sinatra/reloader' if development?
-require 'pry'
 require 'time'
 require 'date'
+require 'pry'
 
 configure do 
   enable :sessions
-  set :session_secret, 'super secret'
+  set :session_secret, 'acb2743915b9afbcc2cc91a79acf9dfe492f5d98f2f84608be613323ef304b09'
 end
 
 before do 
@@ -52,16 +52,16 @@ get '/live_track/new' do
   erb :new_record, layout: :layout
 end
 
-get '/all_records' do 
-  @records = session[:records]
-  erb :all_records, layout: :layout
-end
-
 post '/all_records' do 
  check_for_entry_errors
  params[:id] = session[:records].size 
  session[:records] << {id: params[:id], project: params[:project], task: params[:task], rate: params[:rate], starttime: Time.now.to_s }
  redirect '/live_track'
+end
+
+get '/all_records' do
+  @records = session[:records]
+  erb :all_records, layout: :layout
 end
 
 post '/all_records/:id/delete' do

@@ -1,12 +1,14 @@
 <html>
 <h1>Welcome to Time Track</h1>
-<div>This is an app to track time.<p>
+<h2>This is an app to track tasks and calculate earnings.</h2>
 </html>
 
 <% if session[:success] %>
   <p>Signed in as <%= session[:username] %></p>
   <p>Click <a href='/live_track/new'>here</a> to begin tracking time</p>
-  <p>View <a href='/all_records'>all entries</a></p>
+  <% if !@records.nil? %>
+    <p>View <a href='/all_records'>all entries</a></p>
+  <% end %>
 <% else %>
   <p>Please <a href='/login'>log in</a> to continue</p>
 <% end %>

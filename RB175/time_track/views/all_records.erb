@@ -1,10 +1,11 @@
+<h2>Records</h2>
 <% if @records.empty? %>
   <p>There are no entries. <a href="/live_track/new">Click here</a> to start recording.</p>
 <% end %>
 
 <ul id="records">
   <% @records.each do |record| %>
-    <li>Project: <%= record[:project] %></li>
+    <li><b>Project: <%= record[:project] %></b></li>
     <li>Task: <%= record[:task] %></li>
     <li>Rate: $<%= record[:rate] %></li>
     <li>Start Time: <%= record[:starttime] %></li>
